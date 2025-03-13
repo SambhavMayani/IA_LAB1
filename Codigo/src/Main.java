@@ -1,27 +1,18 @@
-//poner package
-//seguro que hay muchas cosas mal pero es para guiarnos
-
-import IA.RedSensores.CentrosDatos;
-import IA.RedSensores.Centro;
-import IA.RedSensores.Sensor;
-import IA.RedSensores.Sensores;
-
-import java.util.*;
-
-import aima.search.framework.*;
-import aima.search.informed.HillClimbingSearch;
-
-import Criteriosalgoritmos.Estado;
-import Criteriosalgoritmos.RedSensoresGoalTest;
-import Criteriosalgoritmos.RedSensoresHeuristicFunction;
-import Criteriosalgoritmos.RedSensoresSuccessorFunction;
-
+import IA.Red.CentrosDatos;
+import IA.Red.Centro;
+import IA.Red.Sensor;
+import IA.Red.Sensores;
 
 import java.util.*;
 
 import aima.search.framework.*;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
+
+import Criteriosalgoritmos.Estado;
+import Criteriosalgoritmos.RedSensoresGoalTest;
+import Criteriosalgoritmos.RedSensoresHeuristicFunction;
+import Criteriosalgoritmos.RedSensoresSuccessorFunction;
 
 public class Main {
     public static void main(String[] args) {

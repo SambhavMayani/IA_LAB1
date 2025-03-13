@@ -1,4 +1,4 @@
-package Criteriosalgoritmos; //cambiar esto
+package Criteriosalgoritmos;
 
 import aima.search.framework.GoalTest;
 

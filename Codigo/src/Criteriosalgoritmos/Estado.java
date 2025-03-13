@@ -1,10 +1,9 @@
 package Criteriosalgoritmos;
-//TODO EN GENERAL ESTA MAL PERO ES PARA GUIARNOS
 
-import IA.RedSensores.Sensor;
-import IA.RedSensores.Sensores;
-import IA.RedSensores.CentroDatos;
-import IA.RedSensores.CentrosDatos;
+import IA.Red.Sensor;
+import IA.Red.Sensores;
+import IA.Red.Centro;
+import IA.Red.CentrosDatos;
 
 import java.util.Arrays;
 
