@@ -93,38 +93,26 @@ public class Main {
         Sensores sensores = new Sensores(nsensores, seed);
 
         Estado.sensores = sensores;
-        Estado.centros = centros;
+        Estado.centrosDatos = centros;
         Estado.a = a;
         Estado.b = b;
 
         if (greedy) {
-            sensores.sort(new Comparator<Sensor>() {
-                @Override
-                public int compare(Sensor s1, Sensor s2) {
-                    // Ordenar por importancia y capacidad
-                    if (s1.getImportancia() > s2.getImportancia()) return -1;
-                    else if (s1.getImportancia() < s2.getImportancia()) return 1;
-                    else {
-                        if (s1.getCapacidad() > s2.getCapacidad()) return -1;
-                        else if (s1.getCapacidad() < s2.getCapacidad()) return 1;
-                        else return 0;
-                    }
-                }
-            });
+            //Por hacer
         }
         else {
-            sensores.sort(new Comparator<Sensor>() {
-                @Override
-                public int compare(Sensor s1, Sensor s2) {
-                    return s2.getImportancia() - s1.getImportancia();
-                }
-            });
+//            sensores.sort(new Comparator<Sensor>() {
+//                @Override
+//                public int compare(Sensor s1, Sensor s2) {
+//                    return s2.getCapacidad() - s1.getCapacidad();
+//                }
+//            });
         }
 
         Estado inicial = new Estado(greedy);
 
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
-        else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
+        //else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
 
         end_time = System.nanoTime();
         int duracion = (int)(end_time-ini_time)/1000000;
@@ -147,7 +135,7 @@ public class Main {
 
             Estado solucion = (Estado) search.getGoalState();
 
-            System.out.println("Valores de la solución final: (" + solucion.getEnergiaTotal() + " energía, " + solucion.getFiabilidad() + " fiabilidad)");
+            //System.out.println("Valores de la solución final: (" + solucion.get() + " energía, " + solucion.getFiabilidad() + " fiabilidad)");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -28,7 +28,7 @@ public class Estado {
         return a * costo - b * eficiencia;
     }
 
-    Estado(boolean greedy) {
+    public Estado(boolean greedy) {
         asignacionSensores = new int[sensores.size()];
         capacidadCentros = new double[centrosDatos.size()];
 
