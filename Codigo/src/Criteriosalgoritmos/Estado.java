@@ -18,7 +18,7 @@ public class Estado {
     private double ocupacionCentros[];
     private int cantidadConexionesCentros[];
     private int cantidadConexionesSensores[];
-    private int ocupacionSensores[];
+    private double ocupacionSensores[];
     private double costo = 0;
     private double eficiencia = 0;
 
@@ -65,12 +65,13 @@ public class Estado {
     }
     //conecta i a j, el booleano indica si j es sensor o centro
     private void ConectarA(int i, int j, boolean sensor) {
+        Desconectar(i);
         if(!sensor) {
-            ocupacionCentros[j] += sensores.get(i).getCapacidad();
+            ocupacionCentros[j] += Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
             cantidadConexionesCentros[j] += 1;
         }
         else {
-            ocupacionSensores[j]+= sensores.get(i).getCapacidad();
+            ocupacionSensores[j]+= Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
             cantidadConexionesSensores[j] += 1;
         }
         asignacionSensores[i].setAssignacion(j);
@@ -80,13 +81,14 @@ public class Estado {
     private void Desconectar(int i) {
         boolean sensor = asignacionSensores[i].getConectaSensor();
         int j = asignacionSensores[i].getAssignacion();
-        if(!sensor) {
-            ocupacionCentros[j] -= sensores.get(i).getCapacidad();
-            cantidadConexionesCentros[j] -= 1;
-        }
-        else {
-            ocupacionSensores[j]-= sensores.get(i).getCapacidad();
-            cantidadConexionesSensores[j] -= 1;
+        if (j != -1) {
+            if (!sensor) {
+                ocupacionCentros[j] -= sensores.get(i).getCapacidad();
+                cantidadConexionesCentros[j] -= 1;
+            } else {
+                ocupacionSensores[j] -= sensores.get(i).getCapacidad();
+                cantidadConexionesSensores[j] -= 1;
+            }
         }
         asignacionSensores[i].setAssignacion(-1);
 

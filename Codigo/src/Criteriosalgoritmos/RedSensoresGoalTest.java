@@ -7,7 +7,7 @@ public class RedSensoresGoalTest implements GoalTest {
     public boolean isGoalState(Object state){
         Estado estado = (Estado) state;
 
-        return  estado.isGoal();;
+        return  estado.isGoal();
     }
 }
 
