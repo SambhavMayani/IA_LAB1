@@ -113,7 +113,20 @@ public class Estado {
         for (int i = 0; i < centrosDatos.size(); i++) {
             if (cantidadConexionesCentros[i] > 25) return false;
         }
+        for (int i = 0; i < sensores.size(); i++) {
+            if (!connectsToCenter(i)) return false;
+        }
+
         return true;
+    }
+
+    private boolean connectsToCenter(int i) {
+        if (asignacionSensores[i].getAssignacion() == -1) return false;
+        if (asignacionSensores[i].getConectaSensor()) {
+            return connectsToCenter(asignacionSensores[i].getAssignacion());
+        } else {
+            return true;
+        }
     }
 }
 
