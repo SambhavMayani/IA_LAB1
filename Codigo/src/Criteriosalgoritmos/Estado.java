@@ -38,7 +38,7 @@ public class Estado {
         else generarSolucionIngenua();
     }
 
-    Estado(Estado e) {
+    public void clone(Estado e) {
         asignacionSensores = Arrays.copyOf(e.asignacionSensores, sensores.size());
         capacidadCentros = Arrays.copyOf(e.capacidadCentros, centrosDatos.size());
         this.costo = e.costo;
@@ -50,6 +50,6 @@ public class Estado {
     }
 
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
-        
+
     }
 }
