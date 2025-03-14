@@ -6,6 +6,6 @@ public class RedSensoresHeuristicFunction implements HeuristicFunction {
 
     public double getHeuristicValue(Object n){
 
-        return ((RedSensores) n).heuristic();
+        return 0;
     }
 }
