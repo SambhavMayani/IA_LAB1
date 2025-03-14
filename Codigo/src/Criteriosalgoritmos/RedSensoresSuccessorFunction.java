@@ -13,7 +13,7 @@ public class RedSensoresSuccessorFunction implements SuccessorFunction{
     //tendrá errores se tiene que hacer pero para que sirva de guia
     public List<Successor> getSuccessors(Object a) {
         ArrayList<Successor> retVal = new ArrayList<>();
-        
+
 
         return retVal;
     }
