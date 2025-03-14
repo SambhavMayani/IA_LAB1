@@ -5,6 +5,7 @@ import IA.Red.Sensores;
 import IA.Red.Centro;
 import IA.Red.CentrosDatos;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Estado {
@@ -46,7 +47,16 @@ public class Estado {
     }
 
     void generarSolucionIngenua() { //meter algo auqui random ns, lo de abajo est amal
-
+        int j = 0;
+        for (int i = 0; i < sensores.size(); i++) {
+            double temp = capacidadCentros[j];
+            temp += sensores.get(i).getCapacidad();
+            if (temp > 150) {
+                j++;
+            }
+            asignacionSensores[i] = j;
+            capacidadCentros[j] += sensores.get(i).getCapacidad();
+        }
     }
 
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal

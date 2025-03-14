@@ -101,6 +101,7 @@ public class Main {
 
         Estado inicial = new Estado(greedy);
 
+
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
         //else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
 
