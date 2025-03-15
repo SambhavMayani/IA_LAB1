@@ -98,12 +98,10 @@ public class Estado {
 
     public boolean isGoal() {
         for (int i = 0; i < sensores.size(); i++) {
-            if (ocupacionSensores[i] > sensores.get(i).getCapacidad()) return false;
             if (cantidadConexionesSensores[i] > 3) return false;
 
         }
         for (int i = 0; i < centrosDatos.size(); i++) {
-            if (ocupacionCentros[i] > 150) return false;
             if (cantidadConexionesCentros[i] > 25) return false;
         }
         return true;
