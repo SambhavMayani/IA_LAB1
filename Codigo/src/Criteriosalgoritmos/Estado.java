@@ -5,6 +5,7 @@ import IA.Red.Sensores;
 import IA.Red.Centro;
 import IA.Red.CentrosDatos;
 import aima.search.csp.Assignment;
+import aima.search.framework.Successor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,6 +108,12 @@ public class Estado {
             if (cantidadConexionesCentros[i] > 25) return false;
         }
         return true;
+    }
+
+    public List<Successor> getSuccessors() {
+        for (int i = 0; i < sensores.size(); i++) {
+
+        }
     }
 }
 
