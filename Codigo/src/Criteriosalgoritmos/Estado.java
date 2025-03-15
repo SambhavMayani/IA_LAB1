@@ -47,6 +47,9 @@ public class Estado {
     public void clone(Estado e) {
         asignacionSensores = Arrays.copyOf(e.asignacionSensores, sensores.size());
         ocupacionCentros = Arrays.copyOf(e.ocupacionCentros, centrosDatos.size());
+        cantidadConexionesCentros = Arrays.copyOf(e.cantidadConexionesCentros, centrosDatos.size());
+        cantidadConexionesSensores = Arrays.copyOf(e.cantidadConexionesSensores, sensores.size());
+        ocupacionSensores = Arrays.copyOf(e.ocupacionSensores, sensores.size());
         this.costo = e.costo;
         this.eficiencia = e.eficiencia;
     }
