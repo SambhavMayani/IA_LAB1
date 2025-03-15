@@ -111,6 +111,26 @@ public class Estado {
         }
         return true;
     }
+
+    public double get_distance(int i, int j, boolean sensor) {
+        double xi = sensores.get(i).getCoordX();
+        double yi = sensores.get(i).getCoordY();
+        double xj;
+        double yj;
+        if(sensor){
+             xj = sensores.get(j).getCoordX();
+             yj = sensores.get(j).getCoordY();
+        }
+        else {
+             xj = centrosDatos.get(j).getCoordX();
+             yj = centrosDatos.get(j).getCoordY();
+        }
+        return Math.sqrt(Math.pow(xi-xj, 2) + Math.pow(yi-yj, 2));
+    }
+
+    public double coste(int i, int j, boolean sensor) {
+        return Math.pow(get_distance(i,j,sensor),2) + Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
+    }
 }
 
 class AsignacionSensor {
