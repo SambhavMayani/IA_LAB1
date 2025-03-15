@@ -37,8 +37,13 @@ public class Estado {
 
     public Estado(boolean greedy) {
         asignacionSensores = new AsignacionSensor[sensores.size()];
+        ocupacionSensores = new double[sensores.size()];
+        cantidadConexionesSensores = new int[sensores.size()];
         ocupacionCentros = new double[centrosDatos.size()];
         cantidadConexionesCentros = new int[centrosDatos.size()];
+        for (int i = 0; i < ocupacionSensores.length; i++) {
+            ocupacionSensores[i] = sensores.get(i).getCapacidad();
+        }
 
         Arrays.fill(asignacionSensores, -1);
 
@@ -46,11 +51,15 @@ public class Estado {
         else generarSolucionIngenua();
     }
 
-    public void clone() {
-        asignacionSensores = Arrays.copyOf(e.asignacionSensores, sensores.size());
-        ocupacionCentros = Arrays.copyOf(e.ocupacionCentros, centrosDatos.size());
-        this.costo = e.costo;
-        this.eficiencia = e.eficiencia;
+    public Estado clone() {
+        Estado nuevo = new Estado(false);
+        nuevo.asignacionSensores = Arrays.copyOf(this.asignacionSensores, sensores.size());
+        nuevo.ocupacionCentros = Arrays.copyOf(this.ocupacionCentros, centrosDatos.size());
+        nuevo.cantidadConexionesCentros = Arrays.copyOf(this.cantidadConexionesCentros, centrosDatos.size());
+        nuevo.cantidadConexionesSensores = Arrays.copyOf(this.cantidadConexionesSensores, sensores.size());
+        nuevo.ocupacionSensores = Arrays.copyOf(this.ocupacionSensores, sensores.size());
+        nuevo.costo = this.costo;
+        nuevo.eficiencia = this.eficiencia;
     }
 
     void generarSolucionIngenua() { //meter algo auqui random ns, lo de abajo est amal
@@ -58,11 +67,10 @@ public class Estado {
         for (int i = 0; i < sensores.size(); i++) {
             ConectarA(i,j, false);
             if (ocupacionCentros[j] > 150 || cantidadConexionesCentros[j] > 25) {
-                cantidadConexionesCentros[j]--;
-                ocupacionCentros[j] -= sensores.get(i).getCapacidad();
+                Desconectar(i);
                 j++;
             }
-            asignacionSensores[i].setAssignacion(j);
+            ConectarA(i,j,false);
         }
     }
     //conecta i a j, el booleano indica si j es sensor o centro
@@ -78,6 +86,7 @@ public class Estado {
         }
         asignacionSensores[i].setAssignacion(j);
         asignacionSensores[i].setConectaSensor(sensor);
+        costo += coste(i, j, sensor);
     }
     //desconecta lo que tenga conectado i
     private void Desconectar(int i) {
@@ -91,6 +100,7 @@ public class Estado {
                 ocupacionSensores[j] -= sensores.get(i).getCapacidad();
                 cantidadConexionesSensores[j] -= 1;
             }
+            costo -= coste(i, j, sensor);
         }
         asignacionSensores[i].setAssignacion(-1);
 
@@ -108,7 +118,20 @@ public class Estado {
         for (int i = 0; i < centrosDatos.size(); i++) {
             if (cantidadConexionesCentros[i] > 25) return false;
         }
+        for (int i = 0; i < sensores.size(); i++) {
+            if (!connectsToCenter(i)) return false;
+        }
+
         return true;
+    }
+
+    private boolean connectsToCenter(int i) {
+        if (asignacionSensores[i].getAssignacion() == -1) return false;
+        if (asignacionSensores[i].getConectaSensor()) {
+            return connectsToCenter(asignacionSensores[i].getAssignacion());
+        } else {
+            return true;
+        }
     }
 
     public List<Successor> getSuccessors() {
@@ -151,6 +174,27 @@ public class Estado {
             }
             this.ConectarA(i,actAssig,isSensor);
         }
+    }
+}
+
+    public double get_distance(int i, int j, boolean sensor) {
+        double xi = sensores.get(i).getCoordX();
+        double yi = sensores.get(i).getCoordY();
+        double xj;
+        double yj;
+        if(sensor){
+             xj = sensores.get(j).getCoordX();
+             yj = sensores.get(j).getCoordY();
+        }
+        else {
+             xj = centrosDatos.get(j).getCoordX();
+             yj = centrosDatos.get(j).getCoordY();
+        }
+        return Math.sqrt(Math.pow(xi-xj, 2) + Math.pow(yi-yj, 2));
+    }
+
+    public double coste(int i, int j, boolean sensor) {
+        return Math.pow(get_distance(i,j,sensor),2) + Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
     }
 }
 
