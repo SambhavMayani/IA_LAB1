@@ -35,8 +35,13 @@ public class Estado {
 
     public Estado(boolean greedy) {
         asignacionSensores = new AsignacionSensor[sensores.size()];
+        ocupacionSensores = new double[sensores.size()];
+        cantidadConexionesSensores = new int[sensores.size()];
         ocupacionCentros = new double[centrosDatos.size()];
         cantidadConexionesCentros = new int[centrosDatos.size()];
+        for (int i = 0; i < ocupacionSensores.length; i++) {
+            ocupacionSensores[i] = sensores.get(i).getCapacidad();
+        }
 
         Arrays.fill(asignacionSensores, -1);
 
@@ -59,11 +64,10 @@ public class Estado {
         for (int i = 0; i < sensores.size(); i++) {
             ConectarA(i,j, false);
             if (ocupacionCentros[j] > 150 || cantidadConexionesCentros[j] > 25) {
-                cantidadConexionesCentros[j]--;
-                ocupacionCentros[j] -= sensores.get(i).getCapacidad();
+                Desconectar(i);
                 j++;
             }
-            asignacionSensores[i].setAssignacion(j);
+            ConectarA(i,j,false);
         }
     }
     //conecta i a j, el booleano indica si j es sensor o centro
@@ -109,7 +113,20 @@ public class Estado {
         for (int i = 0; i < centrosDatos.size(); i++) {
             if (cantidadConexionesCentros[i] > 25) return false;
         }
+        for (int i = 0; i < sensores.size(); i++) {
+            if (!connectsToCenter(i)) return false;
+        }
+
         return true;
+    }
+
+    private boolean connectsToCenter(int i) {
+        if (asignacionSensores[i].getAssignacion() == -1) return false;
+        if (asignacionSensores[i].getConectaSensor()) {
+            return connectsToCenter(asignacionSensores[i].getAssignacion());
+        } else {
+            return true;
+        }
     }
 
     public double get_distance(int i, int j, boolean sensor) {
