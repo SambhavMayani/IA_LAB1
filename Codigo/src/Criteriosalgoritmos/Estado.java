@@ -9,6 +9,7 @@ import aima.search.framework.Successor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Estado {
     public static Sensores sensores;
@@ -45,7 +46,7 @@ public class Estado {
         else generarSolucionIngenua();
     }
 
-    public void clone(Estado e) {
+    public void clone() {
         asignacionSensores = Arrays.copyOf(e.asignacionSensores, sensores.size());
         ocupacionCentros = Arrays.copyOf(e.ocupacionCentros, centrosDatos.size());
         this.costo = e.costo;
@@ -111,8 +112,44 @@ public class Estado {
     }
 
     public List<Successor> getSuccessors() {
+        ArrayList<Successor> retVal = new ArrayList<>();
         for (int i = 0; i < sensores.size(); i++) {
-
+            this.Desconectar(i);
+            int actAssig = asignacionSensores[i].getAssignacion();
+            boolean isSensor = asignacionSensores[i].getConectaSensor();
+            for (int j = 0; j < sensores.size(); j++) {
+                if (isSensor && j != actAssig) {
+                    Estado successor = this.clone();
+                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.ConectarA(i,j,true);
+                    Successor newSuccessor = new Successor("sensor i conectado a j", successor);
+                    retVal.add(newSuccessor);
+                }
+                else if (!isSensor) {
+                    Estado successor = this.clone();
+                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.ConectarA(i,j,true);
+                    Successor newSuccessor = new Successor("sensor i conectado a j", successor);
+                    retVal.add(newSuccessor);
+                }
+            }
+            for (int k = 0; k < centrosDatos.size(); k++) {
+                if (!isSensor && j != actAssig) {
+                    Estado successor = this.clone();
+                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.ConectarA(i,j,true);
+                    Successor newSuccessor = new Successor("sensor i conectado a j", successor);
+                    retVal.add(newSuccessor);
+                }
+                else if (isSensor) {
+                    Estado successor = this.clone();
+                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.ConectarA(i,j,true);
+                    Successor newSuccessor = new Successor("sensor i conectado a j", successor);
+                    retVal.add(newSuccessor);
+                }
+            }
+            this.ConectarA(i,actAssig,isSensor);
         }
     }
 }
