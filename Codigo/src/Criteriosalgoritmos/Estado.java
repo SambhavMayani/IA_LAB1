@@ -54,8 +54,7 @@ public class Estado {
     void generarSolucionIngenua() { //meter algo auqui random ns, lo de abajo est amal
         int j = 0;
         for (int i = 0; i < sensores.size(); i++) {
-            ocupacionCentros[j] += sensores.get(i).getCapacidad();
-            cantidadConexionesCentros[j] += 1;
+            ConectarA(i,j, false);
             if (ocupacionCentros[j] > 150 || cantidadConexionesCentros[j] > 25) {
                 cantidadConexionesCentros[j]--;
                 ocupacionCentros[j] -= sensores.get(i).getCapacidad();
@@ -63,6 +62,34 @@ public class Estado {
             }
             asignacionSensores[i].setAssignacion(j);
         }
+    }
+    //conecta i a j, el booleano indica si j es sensor o centro
+    private void ConectarA(int i, int j, boolean sensor) {
+        if(!sensor) {
+            ocupacionCentros[j] += sensores.get(i).getCapacidad();
+            cantidadConexionesCentros[j] += 1;
+        }
+        else {
+            ocupacionSensores[j]+= sensores.get(i).getCapacidad();
+            cantidadConexionesSensores[j] += 1;
+        }
+        asignacionSensores[i].setAssignacion(j);
+        asignacionSensores[i].setConectaSensor(sensor);
+    }
+    //desconecta lo que tenga conectado i
+    private void Desconectar(int i) {
+        boolean sensor = asignacionSensores[i].getConectaSensor();
+        int j = asignacionSensores[i].getAssignacion();
+        if(!sensor) {
+            ocupacionCentros[j] -= sensores.get(i).getCapacidad();
+            cantidadConexionesCentros[j] -= 1;
+        }
+        else {
+            ocupacionSensores[j]-= sensores.get(i).getCapacidad();
+            cantidadConexionesSensores[j] -= 1;
+        }
+        asignacionSensores[i].setAssignacion(-1);
+
     }
 
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
@@ -79,9 +106,6 @@ public class Estado {
             if (ocupacionCentros[i] > 150) return false;
             if (cantidadConexionesCentros[i] > 25) return false;
         }
-
-
-
         return true;
     }
 }
@@ -111,3 +135,4 @@ class AsignacionSensor {
         this.conectaSensor = conectaSensor;
     }
 }
+
