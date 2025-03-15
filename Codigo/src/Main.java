@@ -97,18 +97,6 @@ public class Main {
         Estado.a = a;
         Estado.b = b;
 
-        if (greedy) {
-            //Por hacer
-        }
-        else {
-//            sensores.sort(new Comparator<Sensor>() {
-//                @Override
-//                public int compare(Sensor s1, Sensor s2) {
-//                    return s2.getCapacidad() - s1.getCapacidad();
-//                }
-//            });
-        }
-
         Estado inicial = new Estado(greedy);
 
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
