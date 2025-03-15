@@ -97,7 +97,10 @@ public class Main {
         Estado.a = a;
         Estado.b = b;
 
+        
+
         Estado inicial = new Estado(greedy);
+
 
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
         //else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
