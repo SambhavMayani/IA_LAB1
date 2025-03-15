@@ -49,14 +49,15 @@ public class Estado {
         else generarSolucionIngenua();
     }
 
-    public void clone(Estado e) {
-        asignacionSensores = Arrays.copyOf(e.asignacionSensores, sensores.size());
-        ocupacionCentros = Arrays.copyOf(e.ocupacionCentros, centrosDatos.size());
-        cantidadConexionesCentros = Arrays.copyOf(e.cantidadConexionesCentros, centrosDatos.size());
-        cantidadConexionesSensores = Arrays.copyOf(e.cantidadConexionesSensores, sensores.size());
-        ocupacionSensores = Arrays.copyOf(e.ocupacionSensores, sensores.size());
-        this.costo = e.costo;
-        this.eficiencia = e.eficiencia;
+    public Estado clone() {
+        Estado nuevo = new Estado(false);
+        nuevo.asignacionSensores = Arrays.copyOf(this.asignacionSensores, sensores.size());
+        nuevo.ocupacionCentros = Arrays.copyOf(this.ocupacionCentros, centrosDatos.size());
+        nuevo.cantidadConexionesCentros = Arrays.copyOf(this.cantidadConexionesCentros, centrosDatos.size());
+        nuevo.cantidadConexionesSensores = Arrays.copyOf(this.cantidadConexionesSensores, sensores.size());
+        nuevo.ocupacionSensores = Arrays.copyOf(this.ocupacionSensores, sensores.size());
+        nuevo.costo = this.costo;
+        nuevo.eficiencia = this.eficiencia;
     }
 
     void generarSolucionIngenua() { //meter algo auqui random ns, lo de abajo est amal
