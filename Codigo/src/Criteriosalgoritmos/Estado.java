@@ -60,6 +60,8 @@ public class Estado {
         nuevo.ocupacionSensores = Arrays.copyOf(this.ocupacionSensores, sensores.size());
         nuevo.costo = this.costo;
         nuevo.eficiencia = this.eficiencia;
+
+        return nuevo;
     }
 
     void generarSolucionIngenua() { //meter algo auqui random ns, lo de abajo est amal
@@ -157,25 +159,26 @@ public class Estado {
                 }
             }
             for (int k = 0; k < centrosDatos.size(); k++) {
-                if (!isSensor && j != actAssig) {
+                if (!isSensor && k != actAssig) {
                     Estado successor = this.clone();
                     //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
-                    successor.ConectarA(i,j,true);
+                    successor.ConectarA(i,k,true);
                     Successor newSuccessor = new Successor("sensor i conectado a j", successor);
                     retVal.add(newSuccessor);
                 }
                 else if (isSensor) {
                     Estado successor = this.clone();
                     //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
-                    successor.ConectarA(i,j,true);
+                    successor.ConectarA(i,k,true);
                     Successor newSuccessor = new Successor("sensor i conectado a j", successor);
                     retVal.add(newSuccessor);
                 }
             }
             this.ConectarA(i,actAssig,isSensor);
         }
+
+        return retVal;
     }
-}
 
     public double get_distance(int i, int j, boolean sensor) {
         double xi = sensores.get(i).getCoordX();
@@ -183,12 +186,12 @@ public class Estado {
         double xj;
         double yj;
         if(sensor){
-             xj = sensores.get(j).getCoordX();
-             yj = sensores.get(j).getCoordY();
+            xj = sensores.get(j).getCoordX();
+            yj = sensores.get(j).getCoordY();
         }
         else {
-             xj = centrosDatos.get(j).getCoordX();
-             yj = centrosDatos.get(j).getCoordY();
+            xj = centrosDatos.get(j).getCoordX();
+            yj = centrosDatos.get(j).getCoordY();
         }
         return Math.sqrt(Math.pow(xi-xj, 2) + Math.pow(yi-yj, 2));
     }
@@ -197,6 +200,7 @@ public class Estado {
         return Math.pow(get_distance(i,j,sensor),2) + Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
     }
 }
+
 
 class AsignacionSensor {
     int assignacion;
