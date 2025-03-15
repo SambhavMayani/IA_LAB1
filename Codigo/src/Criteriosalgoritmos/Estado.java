@@ -83,6 +83,7 @@ public class Estado {
         }
         asignacionSensores[i].setAssignacion(j);
         asignacionSensores[i].setConectaSensor(sensor);
+        costo += coste(i, j, sensor);
     }
     //desconecta lo que tenga conectado i
     private void Desconectar(int i) {
@@ -96,6 +97,7 @@ public class Estado {
                 ocupacionSensores[j] -= sensores.get(i).getCapacidad();
                 cantidadConexionesSensores[j] -= 1;
             }
+            costo -= coste(i, j, sensor);
         }
         asignacionSensores[i].setAssignacion(-1);
 
