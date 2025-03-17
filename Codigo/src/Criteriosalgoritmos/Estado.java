@@ -45,7 +45,12 @@ public class Estado {
             ocupacionSensores[i] = sensores.get(i).getCapacidad();
         }
 
-        Arrays.fill(asignacionSensores, -1);
+        //inicializamos el vector de asignacionSensores
+        asignacionSensores = new AsignacionSensor[sensores.size()];
+        for (int i = 0; i < asignacionSensores.length; i++) {
+            asignacionSensores[i] = new AsignacionSensor();
+            asignacionSensores[i].setAssignacion(-1);
+        }
 
         if (greedy) generarSolucionGreedy();
         else generarSolucionIngenua();
@@ -136,7 +141,7 @@ public class Estado {
         }
     }
 
-    public List<Successor> getSuccessors() {
+    public ArrayList<Successor> getSuccessors() {
         ArrayList<Successor> retVal = new ArrayList<>();
         for (int i = 0; i < sensores.size(); i++) {
             this.Desconectar(i);
