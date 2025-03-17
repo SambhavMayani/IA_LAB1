@@ -80,20 +80,21 @@ public class Estado {
             ConectarA(i,j,false);
         }
     }
-    //conecta i a j, el booleano indica si j es sensor o centro
+    //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
     private void ConectarA(int i, int j, boolean sensor) {
-        Desconectar(i);
-        if(!sensor) {
-            ocupacionCentros[j] += Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
-            cantidadConexionesCentros[j] += 1;
+        if (i != -1 && j != -1) {
+            Desconectar(i);
+            if (!sensor) {
+                ocupacionCentros[j] += Math.max(ocupacionSensores[i], sensores.get(i).getCapacidad());
+                cantidadConexionesCentros[j] += 1;
+            } else {
+                ocupacionSensores[j] += Math.max(ocupacionSensores[i], sensores.get(i).getCapacidad());
+                cantidadConexionesSensores[j] += 1;
+            }
+            asignacionSensores[i].setAssignacion(j);
+            asignacionSensores[i].setConectaSensor(sensor);
+            costo += coste(i, j, sensor);
         }
-        else {
-            ocupacionSensores[j]+= Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
-            cantidadConexionesSensores[j] += 1;
-        }
-        asignacionSensores[i].setAssignacion(j);
-        asignacionSensores[i].setConectaSensor(sensor);
-        costo += coste(i, j, sensor);
     }
     //desconecta lo que tenga conectado i
     private void Desconectar(int i) {
@@ -108,8 +109,9 @@ public class Estado {
                 cantidadConexionesSensores[j] -= 1;
             }
             costo -= coste(i, j, sensor);
+            asignacionSensores[i].setAssignacion(-1);
         }
-        asignacionSensores[i].setAssignacion(-1);
+
 
     }
 
