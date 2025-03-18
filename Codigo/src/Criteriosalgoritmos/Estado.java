@@ -69,15 +69,24 @@ public class Estado {
         return nuevo;
     }
 
-    void generarSolucionIngenua() { //meter algo auqui random ns, lo de abajo est amal
-        int j = 0;
+    void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
+        int centro = 0; boolean centrosLlenos = false;
+        int sensor = 0;
         for (int i = 0; i < sensores.size(); i++) {
-            ConectarA(i,j, false);
-            if (ocupacionCentros[j] > 150 || cantidadConexionesCentros[j] > 25) {
-                Desconectar(i);
-                j++;
+            ConectarA(i,centro, false);
+            if (!centrosLlenos) { //si hay demasiado pocos centros y muchos sensores
+                if (ocupacionCentros[centro] > 150 || cantidadConexionesCentros[centro] > 25) {
+                    Desconectar(i);
+                    centro++;
+                    if (centro == centrosDatos.size()) {
+                        centrosLlenos = true;
+                    }
+                }
             }
-            ConectarA(i,j,false);
+            else {
+                ConectarA(i,sensor, true);
+                ++sensor;
+            }
         }
     }
     //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
