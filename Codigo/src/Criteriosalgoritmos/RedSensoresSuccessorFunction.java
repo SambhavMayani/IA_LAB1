@@ -12,9 +12,10 @@ import aima.search.framework.SuccessorFunction;
 public class RedSensoresSuccessorFunction implements SuccessorFunction{
     //tendrá errores se tiene que hacer pero para que sirva de guia
     public List<Successor> getSuccessors(Object a) {
-        ArrayList<Successor> retVal = new ArrayList<>();
         Estado estado = (Estado) a;
-        retVal = estado.getSuccessors();
+
+        ArrayList<Successor> retVal = estado.getSuccessors();
+
         return retVal;
     }
 }
