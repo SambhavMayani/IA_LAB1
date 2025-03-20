@@ -45,7 +45,12 @@ public class Estado {
             ocupacionSensores[i] = sensores.get(i).getCapacidad();
         }
 
-        Arrays.fill(asignacionSensores, -1);
+        //inicializamos el vector de asignacionSensores
+        asignacionSensores = new AsignacionSensor[sensores.size()];
+        for (int i = 0; i < asignacionSensores.length; i++) {
+            asignacionSensores[i] = new AsignacionSensor();
+            asignacionSensores[i].setAssignacion(-1);
+        }
 
         if (greedy) generarSolucionGreedy();
         else generarSolucionIngenua();
@@ -64,31 +69,41 @@ public class Estado {
         return nuevo;
     }
 
-    void generarSolucionIngenua() { //meter algo auqui random ns, lo de abajo est amal
-        int j = 0;
+    void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
+        int centro = 0; boolean centrosLlenos = false;
+        int sensor = 0;
         for (int i = 0; i < sensores.size(); i++) {
-            ConectarA(i,j, false);
-            if (ocupacionCentros[j] > 150 || cantidadConexionesCentros[j] > 25) {
-                Desconectar(i);
-                j++;
+            ConectarA(i,centro, false);
+            if (!centrosLlenos) { //si hay demasiado pocos centros y muchos sensores
+                if (ocupacionCentros[centro] > 150 || cantidadConexionesCentros[centro] > 25) {
+                    Desconectar(i);
+                    centro++;
+                    if (centro == centrosDatos.size()) {
+                        centrosLlenos = true;
+                    }
+                }
             }
-            ConectarA(i,j,false);
+            else {
+                ConectarA(i,sensor, true);
+                ++sensor;
+            }
         }
     }
-    //conecta i a j, el booleano indica si j es sensor o centro
+    //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
     private void ConectarA(int i, int j, boolean sensor) {
-        Desconectar(i);
-        if(!sensor) {
-            ocupacionCentros[j] += Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
-            cantidadConexionesCentros[j] += 1;
+        if (i != -1 && j != -1) {
+            Desconectar(i);
+            if (!sensor) {
+                ocupacionCentros[j] += Math.max(ocupacionSensores[i], sensores.get(i).getCapacidad());
+                cantidadConexionesCentros[j] += 1;
+            } else {
+                ocupacionSensores[j] += Math.max(ocupacionSensores[i], sensores.get(i).getCapacidad());
+                cantidadConexionesSensores[j] += 1;
+            }
+            asignacionSensores[i].setAssignacion(j);
+            asignacionSensores[i].setConectaSensor(sensor);
+            costo += coste(i, j, sensor);
         }
-        else {
-            ocupacionSensores[j]+= Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
-            cantidadConexionesSensores[j] += 1;
-        }
-        asignacionSensores[i].setAssignacion(j);
-        asignacionSensores[i].setConectaSensor(sensor);
-        costo += coste(i, j, sensor);
     }
     //desconecta lo que tenga conectado i
     private void Desconectar(int i) {
@@ -103,8 +118,9 @@ public class Estado {
                 cantidadConexionesSensores[j] -= 1;
             }
             costo -= coste(i, j, sensor);
+            asignacionSensores[i].setAssignacion(-1);
         }
-        asignacionSensores[i].setAssignacion(-1);
+
 
     }
 
@@ -136,7 +152,7 @@ public class Estado {
         }
     }
 
-    public List<Successor> getSuccessors() {
+    public ArrayList<Successor> getSuccessors() {
         ArrayList<Successor> retVal = new ArrayList<>();
         for (int i = 0; i < sensores.size(); i++) {
             this.Desconectar(i);
