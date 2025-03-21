@@ -17,10 +17,13 @@ public class Estado {
     public static double a, b;
 
     private AsignacionSensor asignacionSensores[];
-    private double ocupacionCentros[];
+    private double ocupacionCentros[]; //cantida de datos que recibe cada centro
+    //ejemplo de para que nos sirve: centro recibe 152 (anque solo sean perceptibles 150).
+    //cuando se desconecte un sensor que transmita 5 por ejemplo, tendremos que saber que
+    //ahora estamos en 147 y no 145, que sería lo que nos daría sin guardarnos la ocupacion
     private int cantidadConexionesCentros[];
     private int cantidadConexionesSensores[];
-    private double ocupacionSensores[];
+    private double ocupacionSensores[];//lo mismo que los centros pero para los sensores
     private double costo = 0;
     private double eficiencia = 0;
 
@@ -106,10 +109,10 @@ public class Estado {
         int j = asignacionSensores[i].getAssignacion();
         if (j != -1) {
             if (!sensor) {
-                ocupacionCentros[j] -= sensores.get(i).getCapacidad();
+                ocupacionCentros[j] -= Math.min(sensores.get(i).getCapacidad(), ocupacionSensores[i]);
                 cantidadConexionesCentros[j] -= 1;
             } else {
-                ocupacionSensores[j] -= sensores.get(i).getCapacidad();
+                ocupacionSensores[j] -= Math.min(sensores.get(i).getCapacidad(), ocupacionSensores[i]);
                 cantidadConexionesSensores[j] -= 1;
             }
             costo -= coste(i, j, sensor);
@@ -152,42 +155,45 @@ public class Estado {
         for (int i = 0; i < sensores.size(); i++) {
             int actAssig = asignacionSensores[i].getAssignacion();
             boolean isSensor = asignacionSensores[i].getConectaSensor();
-            if (actAssig != -1) this.Desconectar(i);
+            //if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) {
+                //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
                 if (isSensor && j != actAssig) {
                     Estado successor = this.clone();
-                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.Desconectar(i);
                     successor.ConectarA(i,j,true);
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
                     retVal.add(newSuccessor);
                 }
                 else if (!isSensor) {
                     Estado successor = this.clone();
-                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.Desconectar(i);
                     successor.ConectarA(i,j,true);
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
                     retVal.add(newSuccessor);
                 }
             }
             for (int k = 0; k < centrosDatos.size(); k++) {
+                //se podria hacer mejor lo del if y else if solo para no mirar de repetir
+                //el caso actual (arriba lo mismo, pero bueno q estar esta bien supuestamente
                 if (!isSensor && k != actAssig) {
                     Estado successor = this.clone();
-                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.Desconectar(i);
                     successor.ConectarA(i,k,false);
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a centro " + k, successor);
                     retVal.add(newSuccessor);
                 }
                 else if (isSensor) {
                     Estado successor = this.clone();
-                    //successor.Desconectar(i); //mejora de eficiencia, desconecta tal cual del this y luego lo vuelves a conectar, así no desconectas para cada successor
+                    successor.Desconectar(i);
                     successor.ConectarA(i,k,false);
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a centro " + k, successor);
                     retVal.add(newSuccessor);
                 }
             }
             if (actAssig != -1) ConectarA(i,actAssig,isSensor);
+            //'volver a dejarlo como estaba'
         }
-
         return retVal;
     }
 
@@ -218,7 +224,7 @@ class AsignacionSensor {
     boolean conectaSensor;
 
     public AsignacionSensor() {
-        assignacion = 0;
+        assignacion = -1;
         conectaSensor = false;
     }
 

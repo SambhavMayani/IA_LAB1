@@ -59,7 +59,6 @@ public class Main {
             scanner = new Scanner(System.in);
             seed = scanner.nextInt();
         }
-
         boolean greedy;
         System.out.print("¿Qué estrategia para generar la solución inicial quieres usar? [1 para avariciosa / 0 para ingenua]: ");
         scanner = new Scanner(System.in);
