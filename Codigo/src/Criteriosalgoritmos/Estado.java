@@ -157,20 +157,21 @@ public class Estado {
             boolean isSensor = asignacionSensores[i].getConectaSensor();
             if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) {
-                //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
-                if (isSensor && j != actAssig) {
-                    Estado successor = this.clone();
-                    successor.Desconectar(i);
-                    successor.ConectarA(i,j,true);
-                    Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
-                    retVal.add(newSuccessor);
-                }
-                else if (!isSensor) {
-                    Estado successor = this.clone();
-                    successor.Desconectar(i);
-                    successor.ConectarA(i,j,true);
-                    Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
-                    retVal.add(newSuccessor);
+                if (j != i) { //que no me conecta a mi mismo xD
+                    //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
+                    if (isSensor && j != actAssig) {
+                        Estado successor = this.clone();
+                        successor.Desconectar(i);
+                        successor.ConectarA(i, j, true);
+                        Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
+                        retVal.add(newSuccessor);
+                    } else if (!isSensor) {
+                        Estado successor = this.clone();
+                        successor.Desconectar(i);
+                        successor.ConectarA(i, j, true);
+                        Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
+                        retVal.add(newSuccessor);
+                    }
                 }
             }
             for (int k = 0; k < centrosDatos.size(); k++) {
