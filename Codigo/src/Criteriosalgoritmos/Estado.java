@@ -17,7 +17,7 @@ public class Estado {
     public static double a, b;
 
     private AsignacionSensor asignacionSensores[];
-    private double ocupacionCentros[]; //cantida de datos que recibe cada centro
+    private double ocupacionCentros[]; //cantidad de datos que recibe cada centro
     //ejemplo de para que nos sirve: centro recibe 152 (anque solo sean perceptibles 150).
     //cuando se desconecte un sensor que transmita 5 por ejemplo, tendremos que saber que
     //ahora estamos en 147 y no 145, que sería lo que nos daría sin guardarnos la ocupacion
@@ -155,7 +155,7 @@ public class Estado {
         for (int i = 0; i < sensores.size(); i++) {
             int actAssig = asignacionSensores[i].getAssignacion();
             boolean isSensor = asignacionSensores[i].getConectaSensor();
-            //if (actAssig != -1) this.Desconectar(i);
+            if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) {
                 //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
                 if (isSensor && j != actAssig) {
