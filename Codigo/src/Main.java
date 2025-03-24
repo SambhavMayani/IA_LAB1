@@ -99,7 +99,21 @@ public class Main {
         
 
         Estado inicial = new Estado(greedy);
+        //----------------------------ESTO ES DEBUG-------------------------------------
         inicial.debugMostrarEstado();
+
+        inicial.Desconectar(0);
+        inicial.debugMostrarEstado();
+
+        inicial.ConectarA(0,0,false);
+
+        inicial.debugMostrarEstado();
+
+        inicial.ConectarA(0,0,false);
+
+        inicial.debugMostrarEstado();
+
+        //-------------------------------------------------------------------------------
 
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
         //else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);

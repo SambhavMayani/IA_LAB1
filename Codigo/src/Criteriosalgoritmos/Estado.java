@@ -88,14 +88,14 @@ public class Estado {
         }
     }
     //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
-    private void ConectarA(int i, int j, boolean sensor) {
+    public void ConectarA(int i, int j, boolean sensor) {
         //if (i != -1 && j != -1) {
             Desconectar(i);
             if (!sensor) {
-                ocupacionCentros[j] += Math.max(ocupacionSensores[i], sensores.get(i).getCapacidad());
+                ocupacionCentros[j] += ocupacionSensores[i] + sensores.get(i).getCapacidad(); //TODO Retocar esto
                 cantidadConexionesCentros[j] += 1;
             } else {
-                ocupacionSensores[j] += Math.max(ocupacionSensores[i], sensores.get(i).getCapacidad());
+                ocupacionSensores[j] += ocupacionSensores[i] + sensores.get(i).getCapacidad();
                 cantidadConexionesSensores[j] += 1;
             }
             asignacionSensores[i].setAssignacion(j);
@@ -104,15 +104,15 @@ public class Estado {
         //}
     }
     //desconecta lo que tenga conectado i
-    private void Desconectar(int i) {
+    public void Desconectar(int i) {
         boolean sensor = asignacionSensores[i].getConectaSensor();
         int j = asignacionSensores[i].getAssignacion();
         if (j != -1) {
             if (!sensor) {
-                ocupacionCentros[j] -= Math.min(sensores.get(i).getCapacidad(), ocupacionSensores[i]);
+                ocupacionCentros[j] -= sensores.get(i).getCapacidad() + ocupacionSensores[i];
                 cantidadConexionesCentros[j] -= 1;
             } else {
-                ocupacionSensores[j] -= Math.min(sensores.get(i).getCapacidad(), ocupacionSensores[i]);
+                ocupacionSensores[j] -= sensores.get(i).getCapacidad() + ocupacionSensores[i];
                 cantidadConexionesSensores[j] -= 1;
             }
             costo -= coste(i, j, sensor);
@@ -158,7 +158,7 @@ public class Estado {
             boolean isSensor = asignacionSensores[i].getConectaSensor();
             if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) {
-                if (j != i) { //que no me conecta a mi mismo xD
+                if (j != i) { //que no me conecta a mi mismo xD TODO Por alguna razón permite conectar un sensor a lo mismo a lo que estaba conectado otra vez.
                     //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
                     if (isSensor && j != actAssig) {
                         Estado successor = this.clone();
