@@ -35,7 +35,7 @@ public class Estado {
     }
 
     public double getHeuristica() {
-        return a * costo - b * eficiencia;
+        return costo;
     }
 
     public Estado(boolean greedy) {
@@ -134,6 +134,7 @@ public class Estado {
         for (int i = 0; i < centrosDatos.size(); i++) {
             if (cantidadConexionesCentros[i] > 25) return false;
         }
+
         for (int i = 0; i < sensores.size(); i++) {
             if (!connectsToCenter(i)) return false;
         }
@@ -173,7 +174,9 @@ public class Estado {
                         retVal.add(newSuccessor);
                     }
                 }
-            }
+            }/*---------------------------------------------COMMENTDEBUG-------------------------------------------------------
+            --             Parece que el programa se atasca en esta sección de código Y en la solución ingenua              ---
+            -------------------------------------------------------------------------------------------------------------------
             for (int k = 0; k < centrosDatos.size(); k++) {
                 //se podria hacer mejor lo del if y else if solo para no mirar de repetir
                 //el caso actual (arriba lo mismo, pero bueno q estar esta bien supuestamente
@@ -191,7 +194,7 @@ public class Estado {
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a centro " + k, successor);
                     retVal.add(newSuccessor);
                 }
-            }
+            }*/
             if (actAssig != -1) ConectarA(i,actAssig,isSensor);
             //'volver a dejarlo como estaba'
         }
@@ -216,6 +219,30 @@ public class Estado {
 
     public double coste(int i, int j, boolean sensor) {
         return Math.pow(get_distance(i,j,sensor),2) + Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
+    }
+
+    public void debugMostrarEstado() {
+        System.out.println();
+        System.out.print("[");
+        for (int i = 0; i < asignacionSensores.length; i++) {
+            System.out.print("ass:" + asignacionSensores[i].assignacion + " con:" + asignacionSensores[i].conectaSensor);
+            System.out.print(",");
+        }
+        System.out.println("]");
+        System.out.println("ocupacionCentros");
+        System.out.println(Arrays.toString(ocupacionCentros));
+        System.out.println("cantidadConexionesCentros");
+        System.out.println(Arrays.toString(cantidadConexionesCentros));
+
+        System.out.println("cantidadConexionesSensores");
+        System.out.println(Arrays.toString(cantidadConexionesSensores));
+        System.out.println("ocupacionSensores");
+        System.out.println(Arrays.toString(ocupacionSensores));
+
+        System.out.println("costo");
+        System.out.println(costo);
+        System.out.println("eficiencia");
+        System.out.println(eficiencia);
     }
 }
 
