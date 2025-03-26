@@ -3,9 +3,6 @@ package Criteriosalgoritmos;
 /**
  *
  * Clase de Union Find, mantiene la información de los distintos subconjuntos disjuntos de un conjunto,
- * la usamos para hacer Kruskal eficientemente.
- *
- * @author Sambhav Mayani Harlani (sambhav.mayani@estudiantat.upc.edu)
  *
  * Tiene 2 atributos
  * ID: guarda el identificador de cada subconjunto disjunto (el padre del arbol que representa a ese subconjunto)

@@ -26,6 +26,37 @@ public class Estado {
     private double ocupacionSensores[];//lo mismo que los centros pero para los sensores
     private double costo = 0;
     private double eficiencia = 0;
+    private UnionFind UF;   // FALTA: hacer que el conectarA y el desconectarA tengan en cuenta al union find
+
+    //Operaciones del unionFind
+
+    // Vamos a suponer que los primeros elementos del vector que representa el 'grafo del UF' son los centros y a partir de ahí empiezan los sensores
+
+    // retorna la identificacion del arbol en el que está id, hay que tener en cuenta que este valor no está normalizado!!
+    // cuando digo que no está normalizado es que si la identificación < numeroCentros es un centro y cuando no un sensor, por lo que está explicado arriba
+    // La identificación  que retorna el find solo usarla para saber si formamos ciclos o no
+    private int findUF(int i, boolean isSensor) {
+        int id;
+        if (!isSensor) id = i;
+        else id = i + cantidadConexionesCentros.length;
+
+        return UF.find(id);
+    }
+
+    // he metido el bool de isSensorI por si acaso lo necesitamos en un futuro,
+    // aunque sé que solo podemos conectar sensores, los centros no se conectan a algo
+    private void unionUF(int i, int j, boolean isSensorI, boolean isSensorJ) {
+        int idI, idJ;
+
+        if (!isSensorI) idI = i;
+        else idI = i + cantidadConexionesCentros.length;
+
+        if (!isSensorJ) idJ = j;
+        else idJ = j + cantidadConexionesCentros.length;
+
+
+        UF.union(idI, idJ);
+    }
 
     public double getCosto() {
         return costo;
@@ -91,6 +122,7 @@ public class Estado {
 
     void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
         System.out.println();
+        UF = new UnionFind(sensores.size());
         int centro = 0; boolean centrosLlenos = false;
         int sensor = 0;
         for (int i = 0; i < sensores.size(); i++) {
