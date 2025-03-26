@@ -99,6 +99,7 @@ public class Main {
         
 
         Estado inicial = new Estado(greedy);
+        inicial.debugMostrarEstado();
         //----------------------------ESTO ES DEBUG-------------------------------------
         /*
         inicial.debugMostrarEstado();

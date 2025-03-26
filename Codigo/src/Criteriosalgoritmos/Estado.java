@@ -58,7 +58,12 @@ public class Estado {
 
     public Estado clone() {
         Estado nuevo = new Estado(false);
-        nuevo.asignacionSensores = Arrays.copyOf(this.asignacionSensores, sensores.size());
+        nuevo.asignacionSensores = new AsignacionSensor[asignacionSensores.length];
+        for (int i = 0; i< asignacionSensores.length ; i++) {
+            nuevo.asignacionSensores[i] = new AsignacionSensor();
+            nuevo.asignacionSensores[i].conectaSensor = asignacionSensores[i].conectaSensor;
+            nuevo.asignacionSensores[i].assignacion = asignacionSensores[i].assignacion;
+        }
         nuevo.ocupacionCentros = Arrays.copyOf(this.ocupacionCentros, centrosDatos.size());
         nuevo.cantidadConexionesCentros = Arrays.copyOf(this.cantidadConexionesCentros, centrosDatos.size());
         nuevo.cantidadConexionesSensores = Arrays.copyOf(this.cantidadConexionesSensores, sensores.size());
@@ -155,17 +160,30 @@ public class Estado {
         ArrayList<Successor> retVal = new ArrayList<>();
         for (int i = 0; i < sensores.size(); i++) {
             int actAssig = asignacionSensores[i].getAssignacion();
+            System.out.println("El Act assig aquí ha sido "+ asignacionSensores[i].getAssignacion() + " " + actAssig);
             boolean isSensor = asignacionSensores[i].getConectaSensor();
             if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) {
                 if (j != i) { //que no me conecta a mi mismo xD TODO Por alguna razón permite conectar un sensor a lo mismo a lo que estaba conectado otra vez.
                     //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
-                    if (isSensor && j != actAssig) {
+                    if ( j != actAssig) { //Sin isSensor no me asigna multiples sensores de una (no se porque)
                         Estado successor = this.clone();
+                        //System.out.println("Antes de crear sucesor: ");
+                        //debugMostrarEstado();
+
                         successor.Desconectar(i);
                         successor.ConectarA(i, j, true);
                         Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
+
                         retVal.add(newSuccessor);
+
+
+                        System.out.println();
+                        System.out.println("sensor " + i + " conectado a sensor " + j);
+                        System.out.println("Soy " + i + " y estaba conectado al " + (isSensor? "sensor " : "centro ") + actAssig);
+                        successor.debugMostrarEstado();
+                        System.out.print("Viene de: ");
+                        debugMostrarEstado();
                     } else if (!isSensor) {
                         Estado successor = this.clone();
                         successor.Desconectar(i);
@@ -173,8 +191,9 @@ public class Estado {
                         Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
                         retVal.add(newSuccessor);
                     }
-                }
-            }/*---------------------------------------------COMMENTDEBUG-------------------------------------------------------
+                }System.out.println("aaa");
+            }
+            /*---------------------------------------------COMMENTDEBUG-------------------------------------------------------
             --             Parece que el programa se atasca en esta sección de código Y en la solución ingenua              ---
             -------------------------------------------------------------------------------------------------------------------
             for (int k = 0; k < centrosDatos.size(); k++) {
