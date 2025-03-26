@@ -93,6 +93,18 @@ public class Estado {
             }
         }
     }
+
+    // incremento de coste de deconectar el sensor i y conectarlo a 'sensorAConectar
+    int incrementoDeCoste(int i, int sensorAConectar) {
+        int incCoste = 0;
+        boolean sensor = asignacionSensores[i].getConectaSensor();
+        int sensorADesconectar = asignacionSensores[i].getAssignacion();
+        if (sensorADesconectar != -1) incCoste -= coste(i, sensorADesconectar, sensor);
+        incCoste += coste(i, sensorAConectar, sensor);
+
+        return incCoste;
+    }
+
     //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
     public void ConectarA(int i, int j, boolean sensor) {
         //if (i != -1 && j != -1) {
