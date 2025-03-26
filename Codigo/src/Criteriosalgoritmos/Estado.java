@@ -75,6 +75,7 @@ public class Estado {
     }
 
     void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
+        System.out.println();
         int centro = 0; boolean centrosLlenos = false;
         int sensor = 0;
         for (int i = 0; i < sensores.size(); i++) {
@@ -123,14 +124,10 @@ public class Estado {
             costo -= coste(i, j, sensor);
             asignacionSensores[i].setAssignacion(-1);
         }
-
-
     }
-
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
 
     }
-
     public boolean isGoal() {
         for (int i = 0; i < sensores.size(); i++) {
             if (cantidadConexionesSensores[i] > 3) return false;
@@ -139,11 +136,9 @@ public class Estado {
         for (int i = 0; i < centrosDatos.size(); i++) {
             if (cantidadConexionesCentros[i] > 25) return false;
         }
-
         for (int i = 0; i < sensores.size(); i++) {
             if (!connectsToCenter(i)) return false;
         }
-
         return true;
     }
 
