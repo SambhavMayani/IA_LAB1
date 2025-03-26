@@ -35,7 +35,22 @@ public class Estado {
     }
 
     public double getHeuristica() {
-        return costo;
+        double ret = 0;
+        for (int i = 0; i < sensores.size(); i++) {
+            if (cantidadConexionesSensores[i] > 3) ret += 100000;
+
+        }
+        for (int i = 0; i < centrosDatos.size(); i++) {
+            if (cantidadConexionesCentros[i] > 25) ret += 100000;
+        }
+
+        for (int i = 0; i < sensores.size(); i++) {
+            ArrayList<Integer> og = new ArrayList<>();
+            og.add(i);
+            if (!connectsToCenter(i,og)) ret += 100000;
+        }
+        ret += costo;
+        return ret;
     }
 
     public Estado(boolean greedy) {
@@ -141,16 +156,20 @@ public class Estado {
         }
 
         for (int i = 0; i < sensores.size(); i++) {
-            if (!connectsToCenter(i)) return false;
+            ArrayList<Integer> og = new ArrayList<>();
+            og.add(i);
+            if (!connectsToCenter(i,og)) return false;
         }
 
         return true;
     }
 
-    private boolean connectsToCenter(int i) {
-        if (asignacionSensores[i].getAssignacion() == -1) return false;
+    private boolean connectsToCenter(int i, ArrayList<Integer> og) {
+
+        if (asignacionSensores[i].getAssignacion() == -1 || og.contains(asignacionSensores[i].getAssignacion())) return false;
         if (asignacionSensores[i].getConectaSensor()) {
-            return connectsToCenter(asignacionSensores[i].getAssignacion());
+            og.add(i);
+            return connectsToCenter(asignacionSensores[i].getAssignacion(), og);
         } else {
             return true;
         }
@@ -160,13 +179,12 @@ public class Estado {
         ArrayList<Successor> retVal = new ArrayList<>();
         for (int i = 0; i < sensores.size(); i++) {
             int actAssig = asignacionSensores[i].getAssignacion();
-            System.out.println("El Act assig aquí ha sido "+ asignacionSensores[i].getAssignacion() + " " + actAssig);
             boolean isSensor = asignacionSensores[i].getConectaSensor();
             if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) {
-                if (j != i) { //que no me conecta a mi mismo xD TODO Por alguna razón permite conectar un sensor a lo mismo a lo que estaba conectado otra vez.
+                if (j != i) { //que no me conecta a mi mismo xD
                     //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
-                    if ( j != actAssig) { //Sin isSensor no me asigna multiples sensores de una (no se porque)
+                    if (isSensor && j != actAssig) { //Sin isSensor no me asigna multiples sensores de una (no se porque)
                         Estado successor = this.clone();
                         //System.out.println("Antes de crear sucesor: ");
                         //debugMostrarEstado();
@@ -191,11 +209,9 @@ public class Estado {
                         Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
                         retVal.add(newSuccessor);
                     }
-                }System.out.println("aaa");
+                }
             }
-            /*---------------------------------------------COMMENTDEBUG-------------------------------------------------------
-            --             Parece que el programa se atasca en esta sección de código Y en la solución ingenua              ---
-            -------------------------------------------------------------------------------------------------------------------
+
             for (int k = 0; k < centrosDatos.size(); k++) {
                 //se podria hacer mejor lo del if y else if solo para no mirar de repetir
                 //el caso actual (arriba lo mismo, pero bueno q estar esta bien supuestamente
@@ -213,7 +229,7 @@ public class Estado {
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a centro " + k, successor);
                     retVal.add(newSuccessor);
                 }
-            }*/
+            }
             if (actAssig != -1) ConectarA(i,actAssig,isSensor);
             //'volver a dejarlo como estaba'
         }

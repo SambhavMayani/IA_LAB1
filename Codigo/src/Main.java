@@ -140,6 +140,8 @@ public class Main {
             printInstrumentation(agent.getInstrumentation());
 
             Estado solucion = (Estado) search.getGoalState();
+            System.out.println("El final con resultado " + solucion.isGoal());
+            solucion.debugMostrarEstado();
 
             //System.out.println("Valores de la solución final: (" + solucion.get() + " energía, " + solucion.getFiabilidad() + " fiabilidad)");
         } catch (Exception e) {
