@@ -218,7 +218,7 @@ public class Estado {
     }
 
     public double coste(int i, int j, boolean sensor) {
-        return Math.pow(get_distance(i,j,sensor),2) + Math.max(ocupacionSensores[i],sensores.get(i).getCapacidad());
+        return Math.pow(get_distance(i,j,sensor),2) * (ocupacionSensores[i]+sensores.get(i).getCapacidad());
     }
 
     public void debugMostrarEstado() {
