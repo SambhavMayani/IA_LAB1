@@ -100,6 +100,7 @@ public class Main {
 
         Estado inicial = new Estado(greedy);
         //----------------------------ESTO ES DEBUG-------------------------------------
+        /*
         inicial.debugMostrarEstado();
 
         inicial.Desconectar(0);
@@ -112,7 +113,7 @@ public class Main {
         inicial.ConectarA(0,0,false);
 
         inicial.debugMostrarEstado();
-
+        */
         //-------------------------------------------------------------------------------
 
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
