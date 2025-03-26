@@ -90,6 +90,7 @@ public class Estado {
     }
 
     void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
+        System.out.println();
         int centro = 0; boolean centrosLlenos = false;
         int sensor = 0;
         for (int i = 0; i < sensores.size(); i++) {
@@ -107,6 +108,18 @@ public class Estado {
             }
         }
     }
+
+    // incremento de coste de deconectar el sensor i y conectarlo a 'sensorAConectar
+    int incrementoDeCoste(int i, int sensorAConectar) {
+        int incCoste = 0;
+        boolean sensor = asignacionSensores[i].getConectaSensor();
+        int sensorADesconectar = asignacionSensores[i].getAssignacion();
+        if (sensorADesconectar != -1) incCoste -= coste(i, sensorADesconectar, sensor);
+        incCoste += coste(i, sensorAConectar, sensor);
+
+        return incCoste;
+    }
+
     //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
     public void ConectarA(int i, int j, boolean sensor) {
         //if (i != -1 && j != -1) {
@@ -138,14 +151,10 @@ public class Estado {
             costo -= coste(i, j, sensor);
             asignacionSensores[i].setAssignacion(-1);
         }
-
-
     }
-
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
 
     }
-
     public boolean isGoal() {
         for (int i = 0; i < sensores.size(); i++) {
             if (cantidadConexionesSensores[i] > 3) return false;
@@ -154,13 +163,11 @@ public class Estado {
         for (int i = 0; i < centrosDatos.size(); i++) {
             if (cantidadConexionesCentros[i] > 25) return false;
         }
-
         for (int i = 0; i < sensores.size(); i++) {
             ArrayList<Integer> og = new ArrayList<>();
             og.add(i);
             if (!connectsToCenter(i,og)) return false;
         }
-
         return true;
     }
 
