@@ -1,16 +1,11 @@
 package Criteriosalgoritmos;
 
-import IA.Red.Sensor;
 import IA.Red.Sensores;
-import IA.Red.Centro;
 import IA.Red.CentrosDatos;
-import aima.search.csp.Assignment;
-import aima.search.eightpuzzle.ManhattanHeuristicFunction;
 import aima.search.framework.Successor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Estado {
     public static Sensores sensores;
@@ -25,9 +20,10 @@ public class Estado {
     private int cantidadConexionesCentros[];
     private int cantidadConexionesSensores[];
     private double ocupacionSensores[];//lo mismo que los centros pero para los sensores
+    private UnionFind UF;   // FALTA: hacer que el conectarA y el desconectarA tengan en cuenta al union find
+
     private double costo = 0;
     private double eficiencia = 0;
-    private UnionFind UF;   // FALTA: hacer que el conectarA y el desconectarA tengan en cuenta al union find
 
     //Operaciones del unionFind
 
@@ -115,8 +111,11 @@ public class Estado {
         nuevo.cantidadConexionesCentros = Arrays.copyOf(this.cantidadConexionesCentros, centrosDatos.size());
         nuevo.cantidadConexionesSensores = Arrays.copyOf(this.cantidadConexionesSensores, sensores.size());
         nuevo.ocupacionSensores = Arrays.copyOf(this.ocupacionSensores, sensores.size());
+        nuevo.UF = this.UF.clone();
+
         nuevo.costo = this.costo;
         nuevo.eficiencia = this.eficiencia;
+
 
         return nuevo;
     }
@@ -150,58 +149,67 @@ public class Estado {
         if (sensorADesconectar != -1) incCoste -= coste(i, sensorADesconectar, sensor);
         incCoste += coste(i, sensorAConectar, sensor);
 
+
         return incCoste;
     }
 
 
-    //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
-    public void ConectarA(int i, int j, boolean sensor) {
+    //conecta i a j, el booleano indica si j es isSensor o centro, también desconecta del isSensor i el isSensor al que estaba conectado (si lo estaba)
+    public void ConectarA(int i, int j, boolean isSensor) {
         //if (i != -1 && j != -1) {
-            System.out.println("CONECTARA" + i + " a " + (sensor?"Sensor ":"Centro ") +j);
+            System.out.println("CONECTARA" + i + " a " + (isSensor ?"Sensor ":"Centro ") +j);
             Desconectar(i);
-            if (!sensor) {
+            if (!isSensor) {
                 //System.out.println("Ocupacion Centros antes: " + ocupacionCentros[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                propagarOcupacionyCoste(j,sensor,cambio);
+                propagarOcupacionyCoste(j, isSensor,cambio);
                 cantidadConexionesCentros[j] += 1;
                 //System.out.println("Despues: " + ocupacionCentros[j]);
             } else {
                 //System.out.println("Ocupacion Sensores antes: "+ ocupacionSensores[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                propagarOcupacionyCoste(j,sensor,cambio);
+                propagarOcupacionyCoste(j, isSensor,cambio);
                 //ocupacionSensores[j] += Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] += 1;
                 //System.out.println("Despues: " + ocupacionSensores[j]);
             }
             asignacionSensores[i].setAssignacion(j);
-            asignacionSensores[i].setConectaSensor(sensor);
-            costo += coste(i, j, sensor);
+            asignacionSensores[i].setConectaSensor(isSensor);
+            costo += coste(i, j, isSensor);
             System.out.println("FIN CONECTARA");
+
+            int idJUF = j; // idJUF es la id que tiene j en el UnionFind, la i se mantiene igual porque sabemos que es un sensor
+            if (isSensor) idJUF += cantidadConexionesCentros.length;
+            UF.union(i,idJUF);
         //}
     }
     //desconecta lo que tenga conectado i
     public void Desconectar(int i) {
-        boolean sensor = asignacionSensores[i].getConectaSensor();
+        boolean isSensor = asignacionSensores[i].getConectaSensor();
         int j = asignacionSensores[i].getAssignacion();
         System.out.println("DESCONECTARA");
         if (j != -1) {
-            if (!sensor) {
+            if (!isSensor) {
                 //System.out.println("Ocupacion Centros antes: "+ ocupacionCentros[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                propagarOcupacionyCoste(j,sensor,-cambio);
+                propagarOcupacionyCoste(j,isSensor,-cambio);
                 //ocupacionCentros[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesCentros[j] -= 1;
                 //System.out.println("Despues: "+ ocupacionCentros[j]);
             } else {
                 //System.out.println("Ocupacion Sensores antes: "+ocupacionSensores[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                propagarOcupacionyCoste(j,sensor,-cambio);
+                propagarOcupacionyCoste(j,isSensor,-cambio);
                 //ocupacionSensores[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] -= 1;
                 //System.out.println("Despues: "+ ocupacionSensores[j]);
             }
-            costo -= coste(i, j, sensor);
+            costo -= coste(i, j, isSensor);
             asignacionSensores[i].setAssignacion(-1);
+
+            int idJUF = j; // idJUF es la id que tiene j en el UnionFind, la i se mantiene igual porque sabemos que es un sensor
+            if (isSensor) idJUF += cantidadConexionesCentros.length;
+            // UF.noSePuedeDesconectarUnUnionFindJEJEJEJEJ(i,idJUF); NO SE PUEDE DESCONECTAR EN UN UNIONFIND :-(
         }
         System.out.println("FIN DESCONECTARA");
     }
@@ -234,7 +242,7 @@ public class Estado {
     }
 
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
-
+        
     }
     public boolean isGoal() {
         for (int i = 0; i < sensores.size(); i++) {

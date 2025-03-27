@@ -60,4 +60,12 @@ public class UnionFind {
         }
     }
 
+    public UnionFind clone() {
+        UnionFind copy = new UnionFind(id.length);
+        copy.id = id.clone();
+        copy.size = size.clone();
+        return copy;
+
+    }
+
 }
