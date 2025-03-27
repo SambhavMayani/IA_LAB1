@@ -153,6 +153,7 @@ public class Estado {
         return incCoste;
     }
 
+
     //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
     public void ConectarA(int i, int j, boolean sensor) {
         //if (i != -1 && j != -1) {
@@ -161,13 +162,13 @@ public class Estado {
             if (!sensor) {
                 //System.out.println("Ocupacion Centros antes: " + ocupacionCentros[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                actualizarOcupacion(j,sensor,cambio);
+                propagarOcupacionyCoste(j,sensor,cambio);
                 cantidadConexionesCentros[j] += 1;
                 //System.out.println("Despues: " + ocupacionCentros[j]);
             } else {
                 //System.out.println("Ocupacion Sensores antes: "+ ocupacionSensores[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                actualizarOcupacion(j,sensor,cambio);
+                propagarOcupacionyCoste(j,sensor,cambio);
                 //ocupacionSensores[j] += Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] += 1;
                 //System.out.println("Despues: " + ocupacionSensores[j]);
@@ -187,14 +188,14 @@ public class Estado {
             if (!sensor) {
                 //System.out.println("Ocupacion Centros antes: "+ ocupacionCentros[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                actualizarOcupacion(j,sensor,-cambio);
+                propagarOcupacionyCoste(j,sensor,-cambio);
                 //ocupacionCentros[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesCentros[j] -= 1;
                 //System.out.println("Despues: "+ ocupacionCentros[j]);
             } else {
                 //System.out.println("Ocupacion Sensores antes: "+ocupacionSensores[j]);
                 double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
-                actualizarOcupacion(j,sensor,-cambio);
+                propagarOcupacionyCoste(j,sensor,-cambio);
                 //ocupacionSensores[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] -= 1;
                 //System.out.println("Despues: "+ ocupacionSensores[j]);
@@ -205,18 +206,23 @@ public class Estado {
         System.out.println("FIN DESCONECTARA");
     }
 
-    public void actualizarOcupacion(int i, boolean isSensor, double cambio) {
-        System.out.println("Hola soy " + (isSensor?"Sensor":"Centro") + i + ", voy a cambiar " + cambio + " y mi capacidad es " + sensores.get(i).getCapacidad());
-
+    public void propagarOcupacionyCoste(int i, boolean isSensor, double cambio) {
+        //System.out.println("Hola soy " + (isSensor?"Sensor":"Centro") + i + ", voy a cambiar " + cambio + " y mi capacidad es " + sensores.get(i).getCapacidad());
         if (isSensor) {
-            if (asignacionSensores[i].getAssignacion() == -1) return;
+            int siguienteAsignado = asignacionSensores[i].getAssignacion();
+            if (siguienteAsignado == -1) return;
+            boolean isSensorsiguienteAsignado = asignacionSensores[i].getConectaSensor();
             double prevOcupacion = ocupacionSensores[i];
+            double prevCoste = coste(i, siguienteAsignado,isSensorsiguienteAsignado);
             ocupacionSensores[i] += cambio;
-            System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionSensores[i]);
+            double impactocoste = coste(i, siguienteAsignado,isSensorsiguienteAsignado)-prevCoste;
+            costo += impactocoste;
+            System.out.println("impacto de propagar coste en el global" + impactocoste);
+            //System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionSensores[i]);
             double ocupacionMaxima = sensores.get(i).getCapacidad()*2;
             double nCambio = Math.min(cambio, Math.max(0,ocupacionMaxima - prevOcupacion)); //Si el cambio que le ha llegado es positivo, el cambio a su hijo será el cambio anterior o el sobrante entre la ocupacion previa y la maxima.
             if (Math.signum(cambio) == -1) nCambio = Math.max(cambio,Math.min(0,ocupacionSensores[i] - ocupacionMaxima)); //Si el cambio es negativo, al siguiente le quitaré los megabytes que se me han quitado o la diferencia entre la nueva ocupacion y la maxima
-            actualizarOcupacion(asignacionSensores[i].getAssignacion(),asignacionSensores[i].getConectaSensor(),nCambio);
+            propagarOcupacionyCoste(asignacionSensores[i].getAssignacion(),asignacionSensores[i].getConectaSensor(),nCambio);
 
 
 
@@ -226,6 +232,7 @@ public class Estado {
             System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionCentros[i]);
         }
     }
+
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
 
     }
@@ -339,7 +346,7 @@ public class Estado {
     }
 
     public double coste(int i, int j, boolean sensor) {
-        return Math.pow(get_distance(i,j,sensor),2) * (ocupacionSensores[i]+sensores.get(i).getCapacidad());
+        return Math.pow(get_distance(i,j,sensor),2) * Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i]+sensores.get(i).getCapacidad());
     }
 
     public void debugMostrarEstado() {
@@ -396,3 +403,20 @@ class AsignacionSensor {
     }
 }
 
+/*
+Esto estaba WOIP pero al final no hacia fata
+void propagarCosteDesconectar(int i, boolean iSsensor){
+        if(!iSsensor) return;
+        int siguienteSensorAfectado = asignacionSensores[i].getAssignacion();
+        boolean siguienteIsSensor = asignacionSensores[i].getConectaSensor();
+        if(siguienteSensorAfectado == -1 || !siguienteIsSensor) return;
+        int asignacionDelSiguiente = asignacionSensores[siguienteSensorAfectado].getAssignacion();
+        boolean isSensorDelSiguiente = asignacionSensores[siguienteSensorAfectado].getConectaSensor();
+        if(asignacionDelSiguiente == -1) return;
+        double costeprevio = 0; //EHHHH COMO Q NO SE DE DONDE SACAR ESTO ASI Q A METERLO DENTRO DE
+        DONDE TMB SE CAMBIA LA OCUPACION
+        //al calcular este coste ya hemos actualizado ocupación de todos antes de la llamada
+        double nuevocoste = coste(siguienteSensorAfectado, asignacionDelSiguiente, isSensorDelSiguiente);//lo que añadia el siguiente al total
+        //el que empezamos en si, ya se resta en desconectar
+
+    }*/
