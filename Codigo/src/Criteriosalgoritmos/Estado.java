@@ -206,7 +206,7 @@ public class Estado {
     }
 
     public void actualizarOcupacion(int i, boolean isSensor, double cambio) {
-        System.out.println("Hola soy " + (isSensor?"Sensor":"Centro") + i + ", voy a cambiar " + cambio);
+        System.out.println("Hola soy " + (isSensor?"Sensor":"Centro") + i + ", voy a cambiar " + cambio + " y mi capacidad es " + sensores.get(i).getCapacidad());
 
         if (isSensor) {
             if (asignacionSensores[i].getAssignacion() == -1) return;
@@ -215,7 +215,7 @@ public class Estado {
             System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionSensores[i]);
             double ocupacionMaxima = sensores.get(i).getCapacidad()*2;
             double nCambio = Math.min(cambio, Math.max(0,ocupacionMaxima - prevOcupacion)); //Si el cambio que le ha llegado es positivo, el cambio a su hijo será el cambio anterior o el sobrante entre la ocupacion previa y la maxima.
-            if (Math.signum(cambio) == -1) nCambio = Math.min(cambio,Math.max(0,ocupacionSensores[i] - ocupacionMaxima)); //Si el cambio es negativo, al siguiente le quitaré los megabytes que se me han quitado o la diferencia entre la nueva ocupacion y la maxima
+            if (Math.signum(cambio) == -1) nCambio = Math.max(cambio,Math.min(0,ocupacionSensores[i] - ocupacionMaxima)); //Si el cambio es negativo, al siguiente le quitaré los megabytes que se me han quitado o la diferencia entre la nueva ocupacion y la maxima
             actualizarOcupacion(asignacionSensores[i].getAssignacion(),asignacionSensores[i].getConectaSensor(),nCambio);
 
 
