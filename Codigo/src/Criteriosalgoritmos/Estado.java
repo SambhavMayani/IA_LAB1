@@ -155,34 +155,46 @@ public class Estado {
     //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
     public void ConectarA(int i, int j, boolean sensor) {
         //if (i != -1 && j != -1) {
+            //System.out.println("CONECTARA");
             Desconectar(i);
             if (!sensor) {
-                ocupacionCentros[j] += ocupacionSensores[i] + sensores.get(i).getCapacidad(); //TODO Retocar esto
+                //System.out.println("Ocupacion Centros antes: " + ocupacionCentros[j]);
+                ocupacionCentros[j] +=Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesCentros[j] += 1;
+                //System.out.println("Despues: " + ocupacionCentros[j]);
             } else {
-                ocupacionSensores[j] += ocupacionSensores[i] + sensores.get(i).getCapacidad();
+                //System.out.println("Ocupacion Sensores antes: "+ ocupacionSensores[j]);
+                ocupacionSensores[j] += Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] += 1;
+                //System.out.println("Despues: " + ocupacionSensores[j]);
             }
             asignacionSensores[i].setAssignacion(j);
             asignacionSensores[i].setConectaSensor(sensor);
             costo += coste(i, j, sensor);
+            //System.out.println("FIN CONECTARA");
         //}
     }
     //desconecta lo que tenga conectado i
     public void Desconectar(int i) {
         boolean sensor = asignacionSensores[i].getConectaSensor();
         int j = asignacionSensores[i].getAssignacion();
+        //System.out.println("DESCONECTARA");
         if (j != -1) {
             if (!sensor) {
-                ocupacionCentros[j] -= sensores.get(i).getCapacidad() + ocupacionSensores[i];
+                //System.out.println("Ocupacion Centros antes: "+ ocupacionCentros[j]);
+                ocupacionCentros[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesCentros[j] -= 1;
+                //System.out.println("Despues: "+ ocupacionCentros[j]);
             } else {
-                ocupacionSensores[j] -= sensores.get(i).getCapacidad() + ocupacionSensores[i];
+                //System.out.println("Ocupacion Sensores antes: "+ocupacionSensores[j]);
+                ocupacionSensores[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] -= 1;
+                //System.out.println("Despues: "+ ocupacionSensores[j]);
             }
             costo -= coste(i, j, sensor);
             asignacionSensores[i].setAssignacion(-1);
         }
+        //System.out.println("FIN DESCONECTARA");
     }
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
 
