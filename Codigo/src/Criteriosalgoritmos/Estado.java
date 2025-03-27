@@ -5,6 +5,7 @@ import IA.Red.Sensores;
 import IA.Red.Centro;
 import IA.Red.CentrosDatos;
 import aima.search.csp.Assignment;
+import aima.search.eightpuzzle.ManhattanHeuristicFunction;
 import aima.search.framework.Successor;
 
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class Estado {
     }
 
     public Estado clone() {
-        Estado nuevo = new Estado(false);
+        Estado nuevo = new Estado(true);
         nuevo.asignacionSensores = new AsignacionSensor[asignacionSensores.length];
         for (int i = 0; i< asignacionSensores.length ; i++) {
             nuevo.asignacionSensores[i] = new AsignacionSensor();
@@ -155,46 +156,75 @@ public class Estado {
     //conecta i a j, el booleano indica si j es sensor o centro, también desconecta del sensor i el sensor al que estaba conectado (si lo estaba)
     public void ConectarA(int i, int j, boolean sensor) {
         //if (i != -1 && j != -1) {
-            //System.out.println("CONECTARA");
+            System.out.println("CONECTARA" + i + " a " + (sensor?"Sensor ":"Centro ") +j);
             Desconectar(i);
             if (!sensor) {
                 //System.out.println("Ocupacion Centros antes: " + ocupacionCentros[j]);
-                ocupacionCentros[j] +=Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                actualizarOcupacion(j,sensor,cambio);
                 cantidadConexionesCentros[j] += 1;
                 //System.out.println("Despues: " + ocupacionCentros[j]);
             } else {
                 //System.out.println("Ocupacion Sensores antes: "+ ocupacionSensores[j]);
-                ocupacionSensores[j] += Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                actualizarOcupacion(j,sensor,cambio);
+                //ocupacionSensores[j] += Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] += 1;
                 //System.out.println("Despues: " + ocupacionSensores[j]);
             }
             asignacionSensores[i].setAssignacion(j);
             asignacionSensores[i].setConectaSensor(sensor);
             costo += coste(i, j, sensor);
-            //System.out.println("FIN CONECTARA");
+            System.out.println("FIN CONECTARA");
         //}
     }
     //desconecta lo que tenga conectado i
     public void Desconectar(int i) {
         boolean sensor = asignacionSensores[i].getConectaSensor();
         int j = asignacionSensores[i].getAssignacion();
-        //System.out.println("DESCONECTARA");
+        System.out.println("DESCONECTARA");
         if (j != -1) {
             if (!sensor) {
                 //System.out.println("Ocupacion Centros antes: "+ ocupacionCentros[j]);
-                ocupacionCentros[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                actualizarOcupacion(j,sensor,-cambio);
+                //ocupacionCentros[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesCentros[j] -= 1;
                 //System.out.println("Despues: "+ ocupacionCentros[j]);
             } else {
                 //System.out.println("Ocupacion Sensores antes: "+ocupacionSensores[j]);
-                ocupacionSensores[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                double cambio = Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
+                actualizarOcupacion(j,sensor,-cambio);
+                //ocupacionSensores[j] -= Math.min(sensores.get(i).getCapacidad()*3,ocupacionSensores[i] + sensores.get(i).getCapacidad());
                 cantidadConexionesSensores[j] -= 1;
                 //System.out.println("Despues: "+ ocupacionSensores[j]);
             }
             costo -= coste(i, j, sensor);
             asignacionSensores[i].setAssignacion(-1);
         }
-        //System.out.println("FIN DESCONECTARA");
+        System.out.println("FIN DESCONECTARA");
+    }
+
+    public void actualizarOcupacion(int i, boolean isSensor, double cambio) {
+        System.out.println("Hola soy " + (isSensor?"Sensor":"Centro") + i + ", voy a cambiar " + cambio);
+
+        if (isSensor) {
+            if (asignacionSensores[i].getAssignacion() == -1) return;
+            double prevOcupacion = ocupacionSensores[i];
+            ocupacionSensores[i] += cambio;
+            System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionSensores[i]);
+            double ocupacionMaxima = sensores.get(i).getCapacidad()*2;
+            double nCambio = Math.min(cambio, Math.max(0,ocupacionMaxima - prevOcupacion)); //Si el cambio que le ha llegado es positivo, el cambio a su hijo será el cambio anterior o el sobrante entre la ocupacion previa y la maxima.
+            if (Math.signum(cambio) == -1) nCambio = Math.min(cambio,Math.max(0,ocupacionSensores[i] - ocupacionMaxima)); //Si el cambio es negativo, al siguiente le quitaré los megabytes que se me han quitado o la diferencia entre la nueva ocupacion y la maxima
+            actualizarOcupacion(asignacionSensores[i].getAssignacion(),asignacionSensores[i].getConectaSensor(),nCambio);
+
+
+
+        } else {
+            ocupacionCentros[i] += cambio;
+
+            System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionCentros[i]);
+        }
     }
     void generarSolucionGreedy() { //hacer la greedy lo de abajo eta mal
 
@@ -228,60 +258,65 @@ public class Estado {
 
     public ArrayList<Successor> getSuccessors() {
         ArrayList<Successor> retVal = new ArrayList<>();
+        System.out.println("Empezamos generación de sucesores");
         for (int i = 0; i < sensores.size(); i++) {
+            System.out.println("Sucesores cambiando el sensor " + i);
             int actAssig = asignacionSensores[i].getAssignacion();
             boolean isSensor = asignacionSensores[i].getConectaSensor();
-            if (actAssig != -1) this.Desconectar(i);
+            //if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) {
                 if (j != i) { //que no me conecta a mi mismo xD
                     //MIRAR QUE NO FORME CICLOS CONECTAR LAS COSAS!!!
+                    Estado successor = this.clone();
                     if (isSensor && j != actAssig) { //Sin isSensor no me asigna multiples sensores de una (no se porque)
-                        Estado successor = this.clone();
+                        //Estado successor = this.clone();
                         //System.out.println("Antes de crear sucesor: ");
                         //debugMostrarEstado();
-
-                        successor.Desconectar(i);
                         successor.ConectarA(i, j, true);
                         Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
 
                         retVal.add(newSuccessor);
-
-
-                        System.out.println();
-                        System.out.println("sensor " + i + " conectado a sensor " + j);
-                        System.out.println("Soy " + i + " y estaba conectado al " + (isSensor? "sensor " : "centro ") + actAssig);
-                        successor.debugMostrarEstado();
-                        System.out.print("Viene de: ");
-                        debugMostrarEstado();
                     } else if (!isSensor) {
-                        Estado successor = this.clone();
-                        successor.Desconectar(i);
+                        //Estado successor = this.clone();
                         successor.ConectarA(i, j, true);
                         Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
                         retVal.add(newSuccessor);
                     }
+                    System.out.println();
+                    System.out.println("sensor " + i + " conectado a sensor " + j);
+                    System.out.println("Soy " + i + " y estaba conectado al " + (isSensor? "sensor " : "centro ") + actAssig);
+                    successor.debugMostrarEstado();
+                    System.out.print("Viene de: ");
+                    debugMostrarEstado();
                 }
             }
 
             for (int k = 0; k < centrosDatos.size(); k++) {
                 //se podria hacer mejor lo del if y else if solo para no mirar de repetir
                 //el caso actual (arriba lo mismo, pero bueno q estar esta bien supuestamente
+                Estado successor = this.clone();
                 if (!isSensor && k != actAssig) {
-                    Estado successor = this.clone();
+                    //Estado successor = this.clone();
                     successor.Desconectar(i);
                     successor.ConectarA(i,k,false);
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a centro " + k, successor);
                     retVal.add(newSuccessor);
                 }
                 else if (isSensor) {
-                    Estado successor = this.clone();
+                    //Estado successor = this.clone();
                     successor.Desconectar(i);
                     successor.ConectarA(i,k,false);
                     Successor newSuccessor = new Successor("sensor " + i + " conectado a centro " + k, successor);
                     retVal.add(newSuccessor);
                 }
+                System.out.println();
+                System.out.println("sensor " + i + " conectado a centro " + k);
+                System.out.println("Soy " + i + " y estaba conectado al " + (isSensor? "sensor " : "centro ") + actAssig);
+                successor.debugMostrarEstado();
+                System.out.print("Viene de: ");
+                debugMostrarEstado();
             }
-            if (actAssig != -1) ConectarA(i,actAssig,isSensor);
+            //if (actAssig != -1) ConectarA(i,actAssig,isSensor);
             //'volver a dejarlo como estaba'
         }
         return retVal;
@@ -329,6 +364,8 @@ public class Estado {
         System.out.println(costo);
         System.out.println("eficiencia");
         System.out.println(eficiencia);
+        System.out.println("heuristica");
+        System.out.println(getHeuristica());
     }
 }
 
