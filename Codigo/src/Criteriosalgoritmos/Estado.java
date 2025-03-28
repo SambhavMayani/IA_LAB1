@@ -32,17 +32,17 @@ public class Estado {
     // retorna la identificacion del arbol en el que está id, hay que tener en cuenta que este valor no está normalizado!!
     // cuando digo que no está normalizado es que si la identificación < numeroCentros es un centro y cuando no un sensor, por lo que está explicado arriba
     // La identificación  que retorna el find solo usarla para saber si formamos ciclos o no
-    /*private int findUF(int i, boolean isSensor) {
+    private int findUF(int i, boolean isSensor, UnionFind UF) {
         int id;
         if (!isSensor) id = i;
         else id = i + cantidadConexionesCentros.length;
 
         return UF.find(id);
-    }*/
+    }
 
     // he metido el bool de isSensorI por si acaso lo necesitamos en un futuro,
     // aunque sé que solo podemos conectar sensores, los centros no se conectan a algo
-    /*private void unionUF(int i, int j, boolean isSensorI, boolean isSensorJ) {
+    private void unionUF(int i, int j, boolean isSensorI, boolean isSensorJ, UnionFind UF) {
         int idI, idJ;
 
         if (!isSensorI) idI = i;
@@ -53,7 +53,7 @@ public class Estado {
 
 
         UF.union(idI, idJ);
-    }*/
+    }
 
     public double getCosto() {
         return costo;
@@ -111,7 +111,6 @@ public class Estado {
         nuevo.cantidadConexionesCentros = Arrays.copyOf(this.cantidadConexionesCentros, centrosDatos.size());
         nuevo.cantidadConexionesSensores = Arrays.copyOf(this.cantidadConexionesSensores, sensores.size());
         nuevo.ocupacionSensores = Arrays.copyOf(this.ocupacionSensores, sensores.size());
-        //nuevo.UF = this.UF.clone();
 
         nuevo.costo = this.costo;
         nuevo.eficiencia = this.eficiencia;
@@ -122,7 +121,7 @@ public class Estado {
 
     void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
         //System.out.println();
-        //UF = new UnionFind(sensores.size());
+
         int centro = 0; boolean centrosLlenos = false;
         int sensor = 0;
         for (int i = 0; i < sensores.size(); i++) {
@@ -139,6 +138,11 @@ public class Estado {
                 ++sensor;
             }
         }
+    }
+
+    void generarSolucionRandom() {
+        UnionFind UF = new UnionFind(sensores.size());
+
     }
 
     // incremento de coste de deconectar el sensor i y conectarlo a 'sensorAConectar

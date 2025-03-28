@@ -130,7 +130,7 @@ public class Main {
             Problem problem = new Problem(estado, successorFunction, goalTest, heuristicFunction);
             Search search = new HillClimbingSearch();
             SearchAgent agent = new SearchAgent(problem, search);
-            //aquí entra en un bucle infinito
+
             System.out.println();
             printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
