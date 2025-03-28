@@ -68,7 +68,7 @@ public class Main {
         double a = 0.1;
         double b = 0.2;
         if (!heuristicaCoste) {
-            System.out.println("A continuación introduce los parámetros A (pondera el coste) y B (pondera la información) de la heurística (con ',' , no '.'");
+            System.out.println("A continuación introduce los parámetros A (pondera el coste) y B (pondera la información) de la heurística (con ',' , no '.'. Que entre los 2 sumen 1!");
             System.out.print("Ponderación A [0,1 por defecto]: ");
             scanner = new Scanner(System.in);
             a = scanner.nextDouble();
@@ -116,7 +116,7 @@ public class Main {
         else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
 
         end_time = System.nanoTime();
-        int duracion = (int)(end_time-ini_time)/1000000;
+        long duracion = (end_time - ini_time) / 1000000;
         System.out.println("Duración del algoritmo: " + duracion + " ms ");
     }
 
