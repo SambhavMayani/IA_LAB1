@@ -1,3 +1,4 @@
+import Criteriosalgoritmos.*;
 import IA.Red.CentrosDatos;
 import IA.Red.Centro;
 import IA.Red.Sensor;
@@ -8,11 +9,6 @@ import java.util.*;
 import aima.search.framework.*;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
-
-import Criteriosalgoritmos.Estado;
-import Criteriosalgoritmos.RedSensoresGoalTest;
-import Criteriosalgoritmos.RedSensoresHeuristicFunction;
-import Criteriosalgoritmos.RedSensoresSuccessorFunction;
 
 public class Main {
     public static void main(String[] args) {
@@ -118,7 +114,7 @@ public class Main {
         //-------------------------------------------------------------------------------
 
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
-        //else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
+        else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
 
         end_time = System.nanoTime();
         int duracion = (int)(end_time-ini_time)/1000000;
@@ -142,15 +138,13 @@ public class Main {
             Estado solucion = (Estado) search.getGoalState();
             System.out.println("El final con resultado " + solucion.isGoal());
             solucion.debugMostrarEstado();
-
-            //System.out.println("Valores de la solución final: (" + solucion.get() + " energía, " + solucion.getFiabilidad() + " fiabilidad)");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 //ya haremos esto despues del hill climbing casi lo mismo pero cambiamos literalmente la niea de
     //simulated annelaingsearch casi q encia ya esta implementado
- /*   private static void redSensoresSimulatedAnnealingSearch(Estado estado, int steps, int stiter, int k, double lambda) {
+    private static void redSensoresSimulatedAnnealingSearch(Estado estado, int steps, int stiter, int k, double lambda) {
         System.out.println("\nRedSensores Simulated Annealing  -->");
         try {
             RedSensoresSuccessorFunctionSA successorFunction = new RedSensoresSuccessorFunctionSA();
@@ -163,14 +157,11 @@ public class Main {
             System.out.println();
             printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
-
             Estado solucion = (Estado) search.getGoalState();
-
-            System.out.println("Valores de la solución final: (" + solucion.getEnergiaTotal() + " energía, " + solucion.getFiabilidad() + " fiabilidad)");
         } catch (Exception e) {
             e.printStackTrace();
         }
-    } */
+    }
 //ni idea depa q esto
     private static void printInstrumentation(Properties properties) {
         Iterator keys = properties.keySet().iterator();

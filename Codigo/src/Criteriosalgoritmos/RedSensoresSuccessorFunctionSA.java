@@ -9,11 +9,10 @@ import java.util.*;
 import aima.search.framework.Successor;
 import aima.search.framework.SuccessorFunction;
 
-public class RedSensoresSuccessorFunctionSA {
+public class RedSensoresSuccessorFunctionSA implements SuccessorFunction {
     public List<Successor> getSuccessors(Object a) {
-        ArrayList<Successor> retVal = new ArrayList<>();
-        
-
+        Estado estado = (Estado) a;
+        ArrayList<Successor> retVal = estado.getSuccessorsSA();
         return retVal;
     }
 }
