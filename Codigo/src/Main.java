@@ -61,18 +61,18 @@ public class Main {
         greedy = (scanner.nextInt() == 1);
 
         //cambiar esto a las que haremos evidentemente
-        boolean heuristicaEnergia;
-        System.out.print("¿Qué función heurística quieres usar? [1 para solo energía / 0 para energía + fiabilidad]: ");
+        boolean heuristicaCoste;
+        System.out.print("¿Qué función heurística quieres usar? [1 Coste / 0 Coste y información]: ");
         scanner = new Scanner(System.in);
-        heuristicaEnergia = (scanner.nextInt() == 1);
-
-        double a = 0.1, b = 0.2;
-        if (!heuristicaEnergia) {
-            System.out.println("A continuación introduce los parámetros A (pondera la energía) y B (pondera la fiabilidad) de la heurística");
-            System.out.print("Ponderación A [0.1 por defecto]: ");
+        heuristicaCoste = (scanner.nextInt() == 1);
+        double a = 0.1;
+        double b = 0.2;
+        if (!heuristicaCoste) {
+            System.out.println("A continuación introduce los parámetros A (pondera el coste) y B (pondera la información) de la heurística (con ',' , no '.'. Que entre los 2 sumen 1!");
+            System.out.print("Ponderación A [0,1 por defecto]: ");
             scanner = new Scanner(System.in);
             a = scanner.nextDouble();
-            System.out.print("Ponderación B [0.2 por defecto]: ");
+            System.out.print("Ponderación B [0.,2 por defecto]: ");
             scanner = new Scanner(System.in);
             b = scanner.nextDouble();
         }
@@ -80,7 +80,6 @@ public class Main {
             a = 1;
             b = 0;
         }
-
         long ini_time, end_time;
         ini_time = System.nanoTime();
         //cambiarlo para utilzar el .jar que nos dan
@@ -92,7 +91,7 @@ public class Main {
         Estado.a = a;
         Estado.b = b;
 
-        
+
 
         Estado inicial = new Estado(greedy);
         inicial.debugMostrarEstado();
@@ -117,7 +116,7 @@ public class Main {
         else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
 
         end_time = System.nanoTime();
-        int duracion = (int)(end_time-ini_time)/1000000;
+        long duracion = (end_time - ini_time) / 1000000;
         System.out.println("Duración del algoritmo: " + duracion + " ms ");
     }
 

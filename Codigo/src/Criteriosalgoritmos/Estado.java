@@ -61,6 +61,13 @@ public class Estado {
     public double getEficiencia() {
         return eficiencia;
     }
+    public int getInformacion(){
+        int totalinfo = 0;
+        for(int i = 0; i < ocupacionCentros.length; i++){
+            totalinfo += ocupacionCentros[i];
+        }
+        return totalinfo;
+    }
 
     public double getHeuristica() {
         double ret = 0;
@@ -77,7 +84,8 @@ public class Estado {
             og.add(i);
             if (!connectsToCenter(i,og)) ret += 100000;
         }
-        ret += costo;
+        ret += costo* a ;
+        ret -= getInformacion()*b;
         return ret;
     }
 
@@ -121,22 +129,27 @@ public class Estado {
 
     void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
         //System.out.println();
-
-        int centro = 0; boolean centrosLlenos = false;
+        //UF = new UnionFind(sensores.size());
+        int centro = 0;
+        boolean centrosLlenos = false;
         int sensor = 0;
+        boolean sensoresLLenos = false;
         for (int i = 0; i < sensores.size(); i++) {
-            ConectarA(i,centro, false);
             if (!centrosLlenos) { //si hay muy pocos centros y muchos sensores
-                if (ocupacionCentros[centro] > 150 || cantidadConexionesCentros[centro] > 25) {
-                    Desconectar(i);
+                ConectarA(i,centro, false);
+                if (cantidadConexionesCentros[centro] == 25 || ocupacionCentros[centro] > 150 ) {
                     centro++;
-                    if (centro == centrosDatos.size()) { centrosLlenos = true; }
+                    if (centro == centrosDatos.size()) centrosLlenos = true;
                 }
             }
-            else {
+            else if(!sensoresLLenos){
                 ConectarA(i,sensor, true);
-                ++sensor;
+                if (cantidadConexionesSensores[sensor] == 3 || ocupacionSensores[sensor] > sensores.get(sensor).getCapacidad()*3) {
+                    ++sensor;
+                    if (sensor == sensores.size()) sensoresLLenos = true;
+                }
             }
+            else System.out.println("SE HA LLENADO TODO BARBARIDAD??!!");
         }
     }
 
@@ -364,8 +377,10 @@ public class Estado {
         System.out.println("ocupacionSensores");
         System.out.println(Arrays.toString(ocupacionSensores));
 
-        System.out.println("costo");
+        System.out.println("costo(con a aplicado)");
         System.out.println(costo);
+        System.out.println("información(con b aplicado)");
+        System.out.println(getInformacion());
         System.out.println("eficiencia");
         System.out.println(eficiencia);
         System.out.println("heuristica");
