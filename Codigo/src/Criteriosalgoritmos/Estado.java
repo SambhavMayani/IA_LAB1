@@ -6,6 +6,8 @@ import aima.search.framework.Successor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class Estado {
     public static Sensores sensores;
@@ -25,35 +27,6 @@ public class Estado {
     private double costo = 0;
     private double eficiencia = 0;
 
-    //Operaciones del unionFind
-
-    // Vamos a suponer que los primeros elementos del vector que representa el 'grafo del UF' son los centros y a partir de ahí empiezan los sensores
-
-    // retorna la identificacion del arbol en el que está id, hay que tener en cuenta que este valor no está normalizado!!
-    // cuando digo que no está normalizado es que si la identificación < numeroCentros es un centro y cuando no un sensor, por lo que está explicado arriba
-    // La identificación  que retorna el find solo usarla para saber si formamos ciclos o no
-    private int findUF(int i, boolean isSensor, UnionFind UF) {
-        int id;
-        if (!isSensor) id = i;
-        else id = i + cantidadConexionesCentros.length;
-
-        return UF.find(id);
-    }
-
-    // he metido el bool de isSensorI por si acaso lo necesitamos en un futuro,
-    // aunque sé que solo podemos conectar sensores, los centros no se conectan a algo
-    private void unionUF(int i, int j, boolean isSensorI, boolean isSensorJ, UnionFind UF) {
-        int idI, idJ;
-
-        if (!isSensorI) idI = i;
-        else idI = i + cantidadConexionesCentros.length;
-
-        if (!isSensorJ) idJ = j;
-        else idJ = j + cantidadConexionesCentros.length;
-
-
-        UF.union(idI, idJ);
-    }
 
     public double getCosto() {
         return costo;
@@ -107,6 +80,7 @@ public class Estado {
         else generarSolucionIngenua();
     }
 
+
     public Estado clone() {
         Estado nuevo = new Estado(true);
         nuevo.asignacionSensores = new AsignacionSensor[asignacionSensores.length];
@@ -126,6 +100,19 @@ public class Estado {
 
         return nuevo;
     }
+
+    // genera un numero random en el rango de min y max (ambos incluidos) excluyendo el numero exclude
+    public static int getRandomExcluyendo(int min, int max, int exclude) {
+        Random rand = new Random();
+        int result;
+
+        do {
+            result = rand.nextInt(max - min + 1) + min; // Genera un número aleatorio entre min y max
+        } while (result == exclude); // Repite si el número generado es el excluido
+
+        return result;
+    }
+
 
     void generarSolucionIngenua() { //meter algo aqui random ns, lo de abajo esta mal
         //System.out.println();
@@ -153,8 +140,60 @@ public class Estado {
         }
     }
 
+    // genera una solucion random, con una "red" conexa y sin ciclos
     void generarSolucionRandom() {
-        UnionFind UF = new UnionFind(sensores.size());
+
+        Random rand = new Random();
+
+        ArrayList<Integer> sensoresSinAsignar = new ArrayList<>(); // al principio contiene todos los sensors, y cada vez que asigno un sensor en la solución inicial, se elimina de la lista
+        ArrayList<Integer> sensoresAsignados = new ArrayList<>();
+
+        for (int i = 0; i < sensores.size(); i++) {
+            sensoresSinAsignar.add(i);
+        }
+
+
+        for (int c = 0; c < centrosDatos.size(); c++) {
+            //  estos sensores seran los que se conectarán a los centros al principio
+            int randNumSensoresCentroC = rand.nextInt(24) + 1;  // Número entre 1 y 25 (25 porque es el numero máximo de sensores que se pueden conectar a un centro)
+            // no me fijo en la restriccion de ocupación xD (pero si en el numero de conexiones), que se encargue el hillclimbing
+            // (tengo la desventaja de que la solucion inicial es menos buena pero más aleatoriedad de soluciones inciales, al final es un trade-off)
+            // dejo tantos comentarios del estilo para luego justificar nuestras decisiones en el documento eh
+            for (int j = 0; j < randNumSensoresCentroC; ++j) {
+                int indiceRandSensor1 = rand.nextInt(sensoresSinAsignar.size() - 2) + 1; // un sensor random sin asignar
+                int randSensor1 = sensoresSinAsignar.get(indiceRandSensor1);
+                ConectarA(randSensor1, c, false);
+                sensoresSinAsignar.remove(Integer.valueOf(randSensor1)); // como que ya asignamos el sensor, lo quitamos de los SinAsignar
+                sensoresAsignados.add(Integer.valueOf(randSensor1));
+            }
+        }
+        // ahora conecto los sensores sin asignar que me quedan a los asignados de manera random
+        for (int i = 0; i < sensoresSinAsignar.size(); ++i) {
+
+            int indiceRandSensor1 = rand.nextInt(sensoresSinAsignar.size() - 2) + 1; // un sensor random sin asignar
+            int randSensor1 = sensoresSinAsignar.get(indiceRandSensor1);
+
+            int indiceRandSensor2 = rand.nextInt(sensoresAsignados.size() - 2) + 1; // un sensor random de los asignados
+            int randSensor2 = sensoresAsignados.get(indiceRandSensor2);                   // (asi al conectar no formo ciclos)
+
+            // aquí, como a los centros, puedo escoger añadir la restricción de ocupacion (en Mb) o no, pasa lo mismo que antes,
+            // poner ese condicional o no es un trade off entre aleatoriedad y calidad de la solucion inicial
+            // he decidido en ambos casos no ponerlo ya que como el programa ejecuta mas o menos rapido, y el hill climbind en sí es un algoritmo rapido
+            // interesa mas aleatoriedad que calidad de la solucion inicial
+            while (cantidadConexionesSensores[randSensor2] >= 3) {
+                indiceRandSensor2 = rand.nextInt(sensoresAsignados.size() - 2) + 1; // un sensor random de los asignados
+                randSensor2 = sensoresAsignados.get(indiceRandSensor2);                   // (asi al conectar no formo ciclos)
+            }
+
+            ConectarA(randSensor1, randSensor2, true);
+            sensoresSinAsignar.remove(Integer.valueOf(randSensor1));
+            sensoresAsignados.add(Integer.valueOf(randSensor1));
+
+        }
+        // nota para yo acordarme y no liarme mañana: de hecho no hace falta ni union find para verificar si se forma un ciclo o no,
+        // nunca se formará un ciclo ya que solo asignamos sensores no asignados (que no estan conectados a nada desde un principio)
+
+
 
     }
 
