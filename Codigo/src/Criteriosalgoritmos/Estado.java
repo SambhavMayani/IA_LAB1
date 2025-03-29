@@ -4,15 +4,13 @@ import IA.Red.Sensores;
 import IA.Red.CentrosDatos;
 import aima.search.framework.Successor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Estado {
     public static Sensores sensores;
     public static CentrosDatos centrosDatos;
     public static double a, b;
+    public static int rango;
 
     private AsignacionSensor asignacionSensores[];
     private double ocupacionCentros[]; //cantidad de datos que recibe cada centro
@@ -58,11 +56,12 @@ public class Estado {
             if (!connectsToCenter(i,og)) ret += 100000;
         }
         ret += costo* a ;
-        ret -= getInformacion()*b;
+        ret -= getInformacion()*b*10;
+        //el *10 para que afecte algo q en comparacion al costo es muy pequeño
         return ret;
     }
 
-    public Estado(boolean greedy) {
+    public Estado(int modo) {
         asignacionSensores = new AsignacionSensor[sensores.size()];
         ocupacionSensores = new double[sensores.size()];
         cantidadConexionesSensores = new int[sensores.size()];
@@ -76,13 +75,73 @@ public class Estado {
             asignacionSensores[i].setAssignacion(-1);
         }
 
-        if (greedy) generarSolucionGreedy();
-        else generarSolucionIngenua();
+        if (modo == 1) generarSolucionAvariciosa();
+        else if(modo == 0)generarSolucionIngenua();
+        else if(modo == 2) generarSolucionRandom();
+    }
+
+    void generarSolucionAvariciosa() {
+        boolean[] sensoresConectados = new boolean[sensores.size()]; // inicializado a false por defecto
+        // para todos los centros de datos conectamos los sensores que tienen más cerca
+        for (int i = 0; i < centrosDatos.size(); i++) {
+            double mindist = 100000;
+            int sensorcandidato = -1;
+            // miramos cual es el sensor más cercano
+            for (int j = 0; j < sensores.size(); j++) {
+                if (!sensoresConectados[j]) {
+                    double distanciarespectoelactual = get_distance(j, i, false);
+                    if (distanciarespectoelactual < mindist) {
+                        mindist = distanciarespectoelactual;
+                        sensorcandidato = j;
+                    }
+                }
+            }
+            ConectarA(sensorcandidato, i, false); // conectamos el sensor más cercano
+            sensoresConectados[sensorcandidato] = true;
+        }
+        // para todos los sensores que quedan mirar cuales son los sensores conectados a centros que tengan más cerca
+        //quizás sea  tmb mejor mirar los centros otra vez pero ns
+        for (int i = 0; i < sensores.size(); i++) {
+            if (!sensoresConectados[i] && (asignacionSensores[i].getAssignacion() == -1)) {
+                double mindist = 100000;
+                int sensorcandidato = -1;
+                // Recorremos todos los sensores conectados para encontrar el más cercano
+                for (int j = 0; j < sensores.size(); j++) {
+                    if (sensoresConectados[j] && cantidadConexionesSensores[j] < 3) {
+                        double distanciaactual = get_distance(i, j, true);
+                        if (distanciaactual < mindist) {
+                            mindist = distanciaactual;
+                            sensorcandidato = j;
+                        }
+                    }
+                }
+                ConectarA(i, sensorcandidato, true);
+                if (cantidadConexionesSensores[sensorcandidato] >= 3) { // si se ha llenado
+                    // Marcamos el sensor como no disponible para conectar más
+                    sensoresConectados[sensorcandidato] = false;
+                    int sensormascercano = -1;
+                    double distanciamenor = 100000;
+                    // Buscamos el sensor conectado a él que esté más cerca
+                    for (int j = 0; j < asignacionSensores.length; ++j) {
+                        if (asignacionSensores[j].getAssignacion() == sensorcandidato) {
+                            double distanciaactual = get_distance(sensorcandidato, j, true);
+                            if (distanciaactual < distanciamenor) {
+                                sensormascercano = j;
+                                distanciamenor = distanciaactual;
+                            }
+                        }
+                    }
+                    // Marcamos el sensor más cercano como disponible para conectar otros sensores
+                    sensoresConectados[sensormascercano] = true;
+                }
+            }
+        }
     }
 
 
     public Estado clone() {
-        Estado nuevo = new Estado(true);
+        Estado nuevo = new Estado(3); //si es 3, no hace ninguna solucion inicial, moejor pq
+        //total lo vamos a copiar del acutal todo asi que da igual
         nuevo.asignacionSensores = new AsignacionSensor[asignacionSensores.length];
         for (int i = 0; i< asignacionSensores.length ; i++) {
             nuevo.asignacionSensores[i] = new AsignacionSensor();
@@ -293,7 +352,7 @@ public class Estado {
         } else {
             ocupacionCentros[i] += cambio;
 
-           // System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionCentros[i]);
+            // System.out.println("Ahora mi (" + (isSensor?"Sensor":"Centro") + i + ") ocupacion es " + ocupacionCentros[i]);
         }
     }
 
@@ -338,12 +397,12 @@ public class Estado {
             //if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) { //PRUEBAME TODOS LOS SENSORES
                 double distance = get_distance(i, j, true);
-                if ((distance < 70) && (j != i) && (!isSensor || j != actAssig)) {//QUE ESTEN CERCA, NO SEAN EL DE ANTES Y NO SEA YO
+                if ((distance < rango) && (j != i) && (!isSensor || j != actAssig)) {//QUE ESTEN CERCA, NO SEAN EL DE ANTES Y NO SEA YO
                     Estado successor = this.clone();
-                        successor.ConectarA(i, j, true);
-                        Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
+                    successor.ConectarA(i, j, true);
+                    Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
 
-                        retVal.add(newSuccessor);
+                    retVal.add(newSuccessor);
                     /*System.out.println();
                     System.out.println("sensor " + i + " conectado a sensor " + j);
                     System.out.println("Soy " + i + " y estaba conectado al " + (isSensor? "sensor " : "centro ") + actAssig);
@@ -354,8 +413,8 @@ public class Estado {
             }
 
             for (int k = 0; k < centrosDatos.size(); k++) {//AHORA PARA TODOS LOS CENTROS LO MISMO
-               double distance = get_distance(i, k, false);
-                if ((distance < 70) && (isSensor || k != actAssig)) {
+                double distance = get_distance(i, k, false);
+                if ((distance < rango) && (isSensor || k != actAssig)) {
                     Estado successor = this.clone();
                     if (!isSensor && k != actAssig) {
                         successor.Desconectar(i);
@@ -375,7 +434,7 @@ public class Estado {
     }
 
     public ArrayList<Successor> getSuccessorsSA() {
-       return getSuccessors();
+        return getSuccessors();
     }
 
     public double get_distance(int i, int j, boolean sensor) {

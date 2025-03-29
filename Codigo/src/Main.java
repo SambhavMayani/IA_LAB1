@@ -55,10 +55,9 @@ public class Main {
             scanner = new Scanner(System.in);
             seed = scanner.nextInt();
         }
-        boolean greedy;
-        System.out.print("¿Qué estrategia para generar la solución inicial quieres usar? [1 para avariciosa / 0 para ingenua]: ");
+        System.out.print("¿Qué estrategia para generar la solución inicial quieres usar? [0 para ingenua/1 avariciosa/2 random]: ");
         scanner = new Scanner(System.in);
-        greedy = (scanner.nextInt() == 1);
+        int modo = scanner.nextInt();
 
         //cambiar esto a las que haremos evidentemente
         boolean heuristicaCoste;
@@ -80,6 +79,11 @@ public class Main {
             a = 1;
             b = 0;
         }
+        int rango;
+        System.out.println("introuce el rango que quieres que tengan los intercambios: (max 141)");
+        scanner = new Scanner(System.in);
+        rango = scanner.nextInt();
+
         long ini_time, end_time;
         ini_time = System.nanoTime();
         //cambiarlo para utilzar el .jar que nos dan
@@ -90,10 +94,11 @@ public class Main {
         Estado.centrosDatos = centros;
         Estado.a = a;
         Estado.b = b;
+        Estado.rango = rango;
 
 
 
-        Estado inicial = new Estado(greedy);
+        Estado inicial = new Estado(modo);
         inicial.debugMostrarEstado();
         //----------------------------ESTO ES DEBUG-------------------------------------
         /*
