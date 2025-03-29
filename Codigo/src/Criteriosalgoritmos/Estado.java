@@ -434,7 +434,14 @@ public class Estado {
     }
 
     public ArrayList<Successor> getSuccessorsSA() {
-        return getSuccessors();
+        ArrayList<Successor> temp = getSuccessors();
+        Random rnd = new Random();
+        double r = rnd.nextDouble();
+        r *= temp.size() - 1;
+        ArrayList<Successor> ret = new ArrayList<>();
+        ret.add(temp.get((int)Math.floor(r)));
+
+        return ret;
     }
 
     public double get_distance(int i, int j, boolean sensor) {

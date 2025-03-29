@@ -39,7 +39,7 @@ public class Main {
             k = scanner.nextInt();
             System.out.print("Parámetro lambda [0.01 por defecto]: ");
             scanner = new Scanner(System.in);
-            lambda = scanner.nextDouble();
+            lambda = scanner.nextFloat();
         }
 
         int seed;
@@ -99,7 +99,7 @@ public class Main {
 
 
         Estado inicial = new Estado(modo);
-        inicial.debugMostrarEstado();
+
         //----------------------------ESTO ES DEBUG-------------------------------------
         /*
         inicial.debugMostrarEstado();
@@ -119,6 +119,8 @@ public class Main {
 
         if (hillClimb) redSensoresHillClimbingSearch(inicial);
         else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
+
+
 
         end_time = System.nanoTime();
         long duracion = (end_time - ini_time) / 1000000;
@@ -162,6 +164,8 @@ public class Main {
             printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
             Estado solucion = (Estado) search.getGoalState();
+
+            solucion.debugMostrarEstado();
         } catch (Exception e) {
             e.printStackTrace();
         }
