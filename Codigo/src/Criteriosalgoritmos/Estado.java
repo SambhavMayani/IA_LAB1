@@ -218,8 +218,9 @@ public class Estado {
             // no me fijo en la restriccion de ocupación xD (pero si en el numero de conexiones), que se encargue el hillclimbing
             // (tengo la desventaja de que la solucion inicial es menos buena pero más aleatoriedad de soluciones inciales, al final es un trade-off)
             // dejo tantos comentarios del estilo para luego justificar nuestras decisiones en el documento eh
-            for (int j = 0; j < randNumSensoresCentroC; ++j) {
-                int indiceRandSensor1 = rand.nextInt(sensoresSinAsignar.size() - 2) + 1; // un sensor random sin asignar
+            for (int j = 0; j < randNumSensoresCentroC && sensoresSinAsignar.size() != 0; ++j) {
+                //System.out.println(sensoresSinAsignar.size());
+                int indiceRandSensor1 = rand.nextInt(sensoresSinAsignar.size()); // un sensor random sin asignar
                 int randSensor1 = sensoresSinAsignar.get(indiceRandSensor1);
                 ConectarA(randSensor1, c, false);
                 sensoresSinAsignar.remove(Integer.valueOf(randSensor1)); // como que ya asignamos el sensor, lo quitamos de los SinAsignar
@@ -229,10 +230,10 @@ public class Estado {
         // ahora conecto los sensores sin asignar que me quedan a los asignados de manera random
         for (int i = 0; i < sensoresSinAsignar.size(); ++i) {
 
-            int indiceRandSensor1 = rand.nextInt(sensoresSinAsignar.size() - 2) + 1; // un sensor random sin asignar
+            int indiceRandSensor1 = rand.nextInt(sensoresSinAsignar.size()); // un sensor random sin asignar
             int randSensor1 = sensoresSinAsignar.get(indiceRandSensor1);
 
-            int indiceRandSensor2 = rand.nextInt(sensoresAsignados.size() - 2) + 1; // un sensor random de los asignados
+            int indiceRandSensor2 = rand.nextInt(sensoresAsignados.size()); // un sensor random de los asignados
             int randSensor2 = sensoresAsignados.get(indiceRandSensor2);                   // (asi al conectar no formo ciclos)
 
             // aquí, como a los centros, puedo escoger añadir la restricción de ocupacion (en Mb) o no, pasa lo mismo que antes,
