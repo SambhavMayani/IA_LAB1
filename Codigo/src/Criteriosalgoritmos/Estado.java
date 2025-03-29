@@ -394,7 +394,6 @@ public class Estado {
             //System.out.println("Sucesores cambiando el sensor " + i);
             int actAssig = asignacionSensores[i].getAssignacion();
             boolean isSensor = asignacionSensores[i].getConectaSensor();
-            //if (actAssig != -1) this.Desconectar(i);
             for (int j = 0; j < sensores.size(); j++) { //PRUEBAME TODOS LOS SENSORES
                 double distance = get_distance(i, j, true);
                 if ((distance < rango) && (j != i) && (!isSensor || j != actAssig)) {//QUE ESTEN CERCA, NO SEAN EL DE ANTES Y NO SEA YO
@@ -434,14 +433,48 @@ public class Estado {
     }
 
     public ArrayList<Successor> getSuccessorsSA() {
-        ArrayList<Successor> temp = getSuccessors();
+        //ArrayList<Successor> temp = getSuccessors();
         Random rnd = new Random();
-        double r = rnd.nextDouble();
-        r *= temp.size() - 1;
-        ArrayList<Successor> ret = new ArrayList<>();
-        ret.add(temp.get((int)Math.floor(r)));
+        //double r = rnd.nextDouble();
+        //r *= temp.size() - 1;
+        ArrayList<Successor> retVal = new ArrayList<>();
+        //ret.add(temp.get((int)Math.round(r)));
 
-        return ret;
+        int i = (int)Math.round(rnd.nextDouble()*(sensores.size()-1));
+        boolean connectToSensor = rnd.nextBoolean();
+        int j = -1;
+        while (j == -1 && !(connectToSensor && j == i)) {
+            if (connectToSensor) j = (int)Math.round(rnd.nextDouble()*(sensores.size()-1));
+            else j = (int)Math.floor(rnd.nextDouble()*(centrosDatos.size()-1));
+        }
+
+        int actAssig = asignacionSensores[i].getAssignacion();
+        boolean isSensor = asignacionSensores[i].getConectaSensor();
+
+        if (connectToSensor) { //Dependiendo de las variables generadas antes, crea un sucesor
+            double distance = get_distance(i, j, true);
+            if ((distance < rango) && (j != i) && (!isSensor || j != actAssig)) {//QUE ESTEN CERCA, NO SEAN EL DE ANTES Y NO SEA YO
+                Estado successor = this.clone();
+                successor.ConectarA(i, j, true);
+                Successor newSuccessor = new Successor("sensor " + i + " conectado a sensor " + j, successor);
+                retVal.add(newSuccessor);
+            }
+        } else {
+            double distance = get_distance(i, j, false);
+            if ((distance < rango) && (isSensor || j != actAssig)) {
+                Estado successor = this.clone();
+                if (!isSensor && j != actAssig) {
+                    successor.Desconectar(i);
+                    successor.ConectarA(i, j, false);
+                    Successor newSuccessor = new Successor("sensor " + i + " conectado a centro " + j, successor);
+                    retVal.add(newSuccessor);
+                }
+            }
+        }
+
+
+
+        return retVal;
     }
 
     public double get_distance(int i, int j, boolean sensor) {
