@@ -120,11 +120,12 @@ public class Estado {
                     distanciarespectoelactual = get_distance(i, SensorMasCercanoAXcentro[j], true);
                     if (distanciarespectoelactual < mindist) {
                         mindist = distanciarespectoelactual;
-                        sensorCandidato = j;
+                        sensorCandidato = SensorMasCercanoAXcentro[j];
                     }
                 }
             }
-            ConectarA(i, sensorCandidato, false);
+            if(sensorCandidato != -1) ConectarA(i, sensorCandidato, true);
+            //if(cantidadConexionesSensores[sensorCandidato] == 3) SensorMasCercanoAXcentro[sensorCandidato] =  //esto no es lo mejor posible evidentemente
             //si se llena de 3 el mas cercano es un caso muy raro, no creo que valga la pena
             //guardarse los otros 24 de antes para substituirlo
             ++i;
