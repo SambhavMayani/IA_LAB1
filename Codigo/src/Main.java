@@ -56,11 +56,8 @@ public class Main {
             seed = scanner.nextInt();
         } */
 
-        int seed[] = new int[52590978, 1173862344, 1908483126, -861398081, 2004812265, 880724415, 1144008453, 15394290, 1990463790, 6388773];
-        for (int i = 0; i < 10; i++) {
-            Random r = new Random();
-            seed[i] = r.nextInt();
-        }
+        int seed[] = {52590978, 1173862344, 1908483126, -861398081, 2004812265, 880724415, 1144008453, 15394290, 1990463790, 6388773};
+
 
 
         //System.out.print("¿Qué estrategia para generar la solución inicial quieres usar? [0 para ingenua/1 avariciosa/2 random]: ");
@@ -94,7 +91,7 @@ public class Main {
         //int rango;
         //System.out.println("introuce el rango que quieres que tengan los intercambios: (max 141)");
         //scanner = new Scanner(System.in);
-        int rango = 40;
+        int rango = 100;
         for (int i = 0; i < 10; i++) {
 
             long ini_time, end_time;
