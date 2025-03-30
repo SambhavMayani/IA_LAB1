@@ -99,7 +99,7 @@ public class Main {
 
 
         Estado inicial = new Estado(modo);
-
+        inicial.debugMostrarEstado();
         //----------------------------ESTO ES DEBUG-------------------------------------
         /*
         inicial.debugMostrarEstado();
