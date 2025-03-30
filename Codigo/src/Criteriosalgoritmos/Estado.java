@@ -56,7 +56,7 @@ public class Estado {
             if (!connectsToCenter(i,og)) ret += 100000;
         }
         ret += costo* a ;
-        ret -= getInformacion()*b*10;
+        ret -= getInformacion()*b*100;
         //el *10 para que afecte algo q en comparacion al costo es muy pequeño
         return ret;
     }
@@ -244,8 +244,7 @@ public class Estado {
             sensoresAsignados.add(Integer.valueOf(randSensor1));
 
         }
-        // nota para yo acordarme y no liarme mañana: de hecho no hace falta ni union find para verificar si se forma un ciclo o no,
-        // nunca se formará un ciclo ya que solo asignamos sensores no asignados (que no estan conectados a nada desde un principio)
+
 
 
 

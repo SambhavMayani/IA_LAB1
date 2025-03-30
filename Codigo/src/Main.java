@@ -12,19 +12,19 @@ import aima.search.informed.SimulatedAnnealingSearch;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.print("Introduce número de sensores: ");
-        Scanner scanner = new Scanner(System.in);
-        int nsensores = scanner.nextInt();
+        //System.out.print("Introduce número de sensores: ");
+        //Scanner scanner = new Scanner(System.in);
+        int nsensores = 100;
 
-        System.out.print("Introduce número de centros: ");
-        scanner = new Scanner(System.in);
-        int ncentros = scanner.nextInt();
+        //System.out.print("Introduce número de centros: ");
+        //scanner = new Scanner(System.in);
+        int ncentros = 4;
 
-        System.out.print("¿Qué algoritmo quieres usar? [1 para Hill Climbing / 0 para Simulated Annealing]: ");
-        scanner = new Scanner(System.in);
-        boolean hillClimb = (scanner.nextInt() == 1);
+        //System.out.print("¿Qué algoritmo quieres usar? [1 para Hill Climbing / 0 para Simulated Annealing]: ");
+        //scanner = new Scanner(System.in);
+        boolean hillClimb = true;
 
-        int steps = 10000, stiter = 1000, k = 25;
+       /* int steps = 10000, stiter = 1000, k = 25;
         double lambda = 0.01;
         if (!hillClimb) { //YA HAREMOS EL SA DESPUE DEL HILL CLIMBING
             System.out.println("A continuación introduce los parámetros del Simulated annealing");
@@ -40,9 +40,9 @@ public class Main {
             System.out.print("Parámetro lambda [0.01 por defecto]: ");
             scanner = new Scanner(System.in);
             lambda = scanner.nextFloat();
-        }
+        } */
 
-        int seed;
+        /*int seed;
         System.out.print("¿Quieres semilla random? [1 para sí / 0 para no]: ");
         scanner = new Scanner(System.in);
         if (scanner.nextInt() == 1) {
@@ -54,13 +54,21 @@ public class Main {
             System.out.print("Introduce la semilla: ");
             scanner = new Scanner(System.in);
             seed = scanner.nextInt();
+        } */
+
+        int seed[] = new int[52590978, 1173862344, 1908483126, -861398081, 2004812265, 880724415, 1144008453, 15394290, 1990463790, 6388773];
+        for (int i = 0; i < 10; i++) {
+            Random r = new Random();
+            seed[i] = r.nextInt();
         }
-        System.out.print("¿Qué estrategia para generar la solución inicial quieres usar? [0 para ingenua/1 avariciosa/2 random]: ");
-        scanner = new Scanner(System.in);
-        int modo = scanner.nextInt();
+
+
+        //System.out.print("¿Qué estrategia para generar la solución inicial quieres usar? [0 para ingenua/1 avariciosa/2 random]: ");
+        //scanner = new Scanner(System.in);
+        int modo = 0;
 
         //cambiar esto a las que haremos evidentemente
-        boolean heuristicaCoste;
+        /*boolean heuristicaCoste;
         System.out.print("¿Qué función heurística quieres usar? [1 Coste / 0 Coste y información]: ");
         scanner = new Scanner(System.in);
         heuristicaCoste = (scanner.nextInt() == 1);
@@ -78,53 +86,62 @@ public class Main {
         else {
             a = 1;
             b = 0;
+        }*/
+
+        double a = 0.2;
+        double b = 0.8;
+
+        //int rango;
+        //System.out.println("introuce el rango que quieres que tengan los intercambios: (max 141)");
+        //scanner = new Scanner(System.in);
+        int rango = 40;
+        for (int i = 0; i < 10; i++) {
+
+            long ini_time, end_time;
+            ini_time = System.nanoTime();
+            //cambiarlo para utilzar el .jar que nos dan
+
+
+            CentrosDatos centros = new CentrosDatos(ncentros, seed[i]);
+            Sensores sensores = new Sensores(nsensores, seed[i]);
+
+            System.out.println("semilla " + seed[i]);
+
+            Estado.sensores = sensores;
+            Estado.centrosDatos = centros;
+            Estado.a = a;
+            Estado.b = b;
+            Estado.rango = rango;
+
+
+            Estado inicial = new Estado(modo);
+            //inicial.debugMostrarEstado();
+            //----------------------------ESTO ES DEBUG-------------------------------------
+            /*
+            inicial.debugMostrarEstado();
+
+            inicial.Desconectar(0);
+            inicial.debugMostrarEstado();
+
+            inicial.ConectarA(0,0,false);
+
+            inicial.debugMostrarEstado();
+
+            inicial.ConectarA(0,0,false);
+
+            inicial.debugMostrarEstado();
+            */
+            //-------------------------------------------------------------------------------
+
+            if (hillClimb) redSensoresHillClimbingSearch(inicial);
+            //else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
+
+
+            end_time = System.nanoTime();
+            long duracion = (end_time - ini_time) / 1000000;
+            System.out.println("Duración del algoritmo: " + duracion + " ms ");
+
         }
-        int rango;
-        System.out.println("introuce el rango que quieres que tengan los intercambios: (max 141)");
-        scanner = new Scanner(System.in);
-        rango = scanner.nextInt();
-
-        long ini_time, end_time;
-        ini_time = System.nanoTime();
-        //cambiarlo para utilzar el .jar que nos dan
-        CentrosDatos centros = new CentrosDatos(ncentros, seed);
-        Sensores sensores = new Sensores(nsensores, seed);
-
-        Estado.sensores = sensores;
-        Estado.centrosDatos = centros;
-        Estado.a = a;
-        Estado.b = b;
-        Estado.rango = rango;
-
-
-
-        Estado inicial = new Estado(modo);
-        inicial.debugMostrarEstado();
-        //----------------------------ESTO ES DEBUG-------------------------------------
-        /*
-        inicial.debugMostrarEstado();
-
-        inicial.Desconectar(0);
-        inicial.debugMostrarEstado();
-
-        inicial.ConectarA(0,0,false);
-
-        inicial.debugMostrarEstado();
-
-        inicial.ConectarA(0,0,false);
-
-        inicial.debugMostrarEstado();
-        */
-        //-------------------------------------------------------------------------------
-
-        if (hillClimb) redSensoresHillClimbingSearch(inicial);
-        else redSensoresSimulatedAnnealingSearch(inicial, steps, stiter, k, lambda);
-
-
-
-        end_time = System.nanoTime();
-        long duracion = (end_time - ini_time) / 1000000;
-        System.out.println("Duración del algoritmo: " + duracion + " ms ");
     }
 
     private static void redSensoresHillClimbingSearch(Estado estado) {
