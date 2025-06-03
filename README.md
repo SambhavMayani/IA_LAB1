@@ -1,3 +1,7 @@
+Práctica realizada con el objetivo de aprender a utilizar Hill Climbing y Simulated Annealing.
+
+Enunciado en: PracticaBusqueda-local.pdf
+
 Como hacer una ejecución:
 Ir a Codigo/src/Main.java
 Ejecutar el Main
